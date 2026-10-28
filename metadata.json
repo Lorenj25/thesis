@@ -1,0 +1,7 @@
+{
+  "name": "CodeAuthentic",
+  "description": "AI-generated source code detector (C, Java, Python) for live computer laboratory exams.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

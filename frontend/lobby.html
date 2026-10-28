@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeAuthentic - Examination Code Submission</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+    .portal-box {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 540px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+    .header { text-align: center; margin-bottom: 2rem; }
+    .header h1 { font-size: 1.6rem; color: #60a5fa; margin-bottom: 0.35rem; }
+    .header p { color: var(--muted); font-size: 0.9rem; }
+    .lobby-badge {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      background: #172554;
+      color: #93c5fd;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .form-group { margin-bottom: 1.25rem; }
+    label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--muted); }
+    input[type="text"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background-color: #0b1120;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+    }
+    input[type="text"]:focus { border-color: var(--primary); }
+    .dropzone {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      background-color: #0b1120;
+      transition: all 0.2s;
+    }
+    .dropzone.dragover { border-color: var(--primary); background-color: #172554; }
+    .dropzone p { color: var(--muted); font-size: 0.85rem; margin-top: 0.5rem; }
+    .file-list { margin-top: 1rem; list-style: none; }
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #172033;
+      padding: 0.6rem 0.8rem;
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      border: 1px solid var(--border);
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 0.85rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 1.25rem;
+    }
+    .btn-submit:hover { background-color: var(--primary-hover); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    .alert {
+      padding: 0.85rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      margin-bottom: 1.25rem;
+      display: none;
+    }
+    .alert-error { background-color: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .alert-success { background-color: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .closed-box {
+      text-align: center;
+      padding: 3rem 1rem;
+      display: none;
+    }
+    .closed-box h2 { color: #f87171; font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .closed-box p { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="portal-box">
+    <div class="header">
+      <h1>CodeAuthentic</h1>
+      <p>CCIS - Examination Source Submission</p>
+      <div id="lobby-badge" class="lobby-badge">Loading session...</div>
+    </div>
+
+    <!-- Closed notice if locked or expired -->
+    <div id="closed-container" class="closed-box">
+      <h2>This session is closed.</h2>
+      <p>The examination time window has expired or the instructor has locked submissions.</p>
+    </div>
+
+    <!-- Main upload container -->
+    <div id="upload-container">
+      <div id="status-alert" class="alert"></div>
+
+      <form id="submission-form" onsubmit="handleSubmit(event)">
+        <div class="form-group">
+          <label for="student-id">Student ID Number</label>
+          <input type="text" id="student-id" required placeholder="e.g. 2023-01234" autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label>Source Code Files (1 to 3 files: .c, .java, .py)</label>
+          <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" style="margin: 0 auto; display: block;">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <div style="font-weight: 600; margin-top: 0.5rem;">Click to browse or drop files here</div>
+            <p>Maximum 3 files, up to 200 KB each (.c, .java, .py)</p>
+            <input type="file" id="file-input" multiple accept=".c,.java,.py" style="display: none;" onchange="handleFilesSelected(this.files)">
+          </div>
+
+          <ul class="file-list" id="file-list"></ul>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submit-btn" disabled>Submit Source Code</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Extract lobby ID from URL pathname (/lobby/{uuid})
+    const pathParts = window.location.pathname.split('/');
+    const lobbyId = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+    let selectedFiles = [];
+
+    const ALLOWED_EXTS = ['.c', '.java', '.py'];
+    const MAX_SIZE = 200 * 1024; // 200 KB
+
+    async function checkLobbyStatus() {
+      try {
+        const res = await fetch(`/public/lobbies/${lobbyId}/status`);
+        if (!res.ok) throw new Error('Session not found');
+        const data = await res.json();
+
+        document.getElementById('lobby-badge').textContent = data.title;
+
+        if (!data.active) {
+          document.getElementById('upload-container').style.display = 'none';
+          document.getElementById('closed-container').style.display = 'block';
+        }
+      } catch (err) {
+        document.getElementById('upload-container').style.display = 'none';
+        document.getElementById('closed-container').style.display = 'block';
+        document.getElementById('closed-container').querySelector('h2').textContent = 'Session Unavailable';
+        document.getElementById('closed-container').querySelector('p').textContent = err.message;
+      }
+    }
+
+    function handleFilesSelected(fileList) {
+      const alertEl = document.getElementById('status-alert');
+      alertEl.style.display = 'none';
+
+      const newFiles = Array.from(fileList);
+      if (selectedFiles.length + newFiles.length > 3) {
+        showError('You can submit a maximum of 3 files total.');
+        return;
+      }
+
+      for (const file of newFiles) {
+        const ext = '.' + file.name.split('.').pop().toLowerCase();
+        if (!ALLOWED_EXTS.includes(ext)) {
+          showError(`File '${file.name}' has an unsupported extension. Only .c, .java, and .py are allowed.`);
+          return;
+        }
+        if (file.size > MAX_SIZE) {
+          showError(`File '${file.name}' exceeds the 200 KB size limit.`);
+          return;
+        }
+        // Avoid duplicates
+        if (!selectedFiles.some(f => f.name === file.name)) {
+          selectedFiles.push(file);
+        }
+      }
+
+      renderFileList();
+    }
+
+    function removeFile(index) {
+      selectedFiles.splice(index, 1);
+      renderFileList();
+    }
+
+    function renderFileList() {
+      const listEl = document.getElementById('file-list');
+      const submitBtn = document.getElementById('submit-btn');
+
+      listEl.innerHTML = selectedFiles.map((f, idx) => `
+        <li class="file-item">
+          <span><code>${escapeHtml(f.name)}</code> (${Math.round(f.size / 1024)} KB)</span>
+          <button type="button" onclick="removeFile(${idx})" style="background: none; border: none; color: #f87171; cursor: pointer; font-size: 0.9rem;">&times;</button>
+        </li>
+      `).join('');
+
+      submitBtn.disabled = selectedFiles.length === 0;
+    }
+
+    // Drag and drop handlers
+    const dropzone = document.getElementById('dropzone');
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files) {
+        handleFilesSelected(e.dataTransfer.files);
+      }
+    });
+
+    async function handleSubmit(e) {
+      e.preventDefault();
+      const studentId = document.getElementById('student-id').value.trim();
+      const submitBtn = document.getElementById('submit-btn');
+
+      if (!studentId) {
+        showError('Please enter your Student ID.');
+        return;
+      }
+      if (selectedFiles.length === 0) {
+        showError('Please select at least 1 source file.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting files...';
+
+      const formData = new FormData();
+      formData.append('student_id', studentId);
+      selectedFiles.forEach(file => {
+        formData.append('files', file);
+      });
+
+      try {
+        const res = await fetch(`/lobbies/${lobbyId}/submit`, {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.detail || 'Submission failed');
+        }
+
+        showSuccess('Submission received! Your files have been uploaded successfully.');
+        selectedFiles = [];
+        renderFileList();
+        document.getElementById('student-id').value = '';
+      } catch (err) {
+        showError(err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Source Code';
+      }
+    }
+
+    function showError(msg) {
+      const alertEl = document.getElementById('status-alert');
+      alertEl.textContent = msg;
+      alertEl.className = 'alert alert-error';
+      alertEl.style.display = 'block';
+    }
+
+    function showSuccess(msg) {
+      const alertEl = document.getElementById('status-alert');
+      alertEl.textContent = msg;
+      alertEl.className = 'alert alert-success';
+      alertEl.style.display = 'block';
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[tag] || tag));
+    }
+
+    window.addEventListener('DOMContentLoaded', checkLobbyStatus);
+  </script>
+</body>
+</html>
