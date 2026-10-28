@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import {
   Shield,
-  BookOpen,
   Terminal,
   Lock,
-  CheckCircle2,
   AlertTriangle,
   ArrowRight,
   Sparkles,
@@ -75,31 +73,9 @@ export const HomeIntro: React.FC<HomeIntroProps> = ({
             Live AI Source Code Detection for <span className="text-orange-500 underline decoration-orange-500/40">Laboratory Exams</span>
           </h1>
 
-          {/* Introductory Note Required by User */}
-          <div className="p-5 sm:p-6 rounded-2xl bg-stone-950/80 border border-stone-800 text-stone-300 text-sm sm:text-base leading-relaxed space-y-3">
-            <div className="flex items-center gap-2 text-orange-400 font-bold text-xs uppercase tracking-wider">
-              <BookOpen className="w-4 h-4" />
-              <span>Official Introductory Note & Purpose</span>
-            </div>
-            <p>
-              <strong>CodeAuthentic</strong> is a dedicated examination integrity platform developed for live computer laboratory sessions at Caraga State University. 
-              Built on a pre-trained, frozen <strong>CodeBERT</strong> feature-extraction pipeline (770-dimensional representations), it evaluates source files written in <strong>C, Java, and Python</strong> to detect synthetic AI patterns (ChatGPT, GitHub Copilot, Claude) under timed laboratory conditions.
-            </p>
-            <div className="grid sm:grid-cols-3 gap-3 pt-2 text-xs">
-              <div className="p-3 rounded-xl bg-stone-900 border border-stone-800 flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
-                <span><strong>Up to 3 Uploads</strong> per student in every examination lobby.</span>
-              </div>
-              <div className="p-3 rounded-xl bg-stone-900 border border-stone-800 flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
-                <span><strong>Multi-Language</strong> support: C (<code>.c</code>), Java (<code>.java</code>), Python (<code>.py</code>).</span>
-              </div>
-              <div className="p-3 rounded-xl bg-stone-900 border border-stone-800 flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
-                <span><strong>Low, Medium, High</strong> risk stratification for instructor guidance.</span>
-              </div>
-            </div>
-          </div>
+          <p className="max-w-3xl text-sm sm:text-base leading-relaxed text-stone-300">
+            CodeAuthentic supports exam integrity by helping instructors identify potentially AI-generated C, Java, and Python submissions in timed laboratory exams.
+          </p>
 
           {/* Dual Action Gateway */}
           <div className="flex flex-wrap items-center gap-4 pt-2">

@@ -55,7 +55,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 : 'text-stone-400 hover:text-white'
             }`}
           >
-            Home & Intro
+            Home:
           </button>
           <button
             onClick={() => setCurrentView('instructor')}
