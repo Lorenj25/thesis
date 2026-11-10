@@ -17,6 +17,7 @@ import {
 } from './utils/storage';
 import { Navbar } from './components/Navbar';
 import { HomeIntro } from './components/HomeIntro';
+import { InstructorLogin } from './components/InstructorLogin';
 import { InstructorDashboard } from './components/InstructorDashboard';
 import { StudentDashboard } from './components/StudentDashboard';
 
@@ -155,15 +156,8 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
         {currentView === 'home' && (
           <HomeIntro
-            onLogin={handleLogin}
             onNavigateToStudent={() => setCurrentView('student')}
-            onNavigateToInstructor={() => {
-              if (instructor) setCurrentView('instructor');
-              else {
-                const el = document.getElementById('instructor-login-section');
-                el?.scrollIntoView({ behavior: 'smooth' });
-              }
-            }}
+            onNavigateToInstructor={() => setCurrentView('instructor')}
             isInstructorLoggedIn={!!instructor}
           />
         )}
@@ -180,21 +174,7 @@ export default function App() {
                 onSwitchToStudentView={handleSwitchToStudentView}
               />
             ) : (
-              <div className="py-12 text-center max-w-md mx-auto space-y-4">
-                <div className="w-16 h-16 rounded-3xl bg-ca-brand-soft text-ca-brand border border-ca-border flex items-center justify-center mx-auto text-2xl font-black">
-                  !
-                </div>
-                <h2 className="text-xl font-bold text-ca-ink font-display">Faculty Authentication Required</h2>
-                <p className="text-xs text-ca-muted">
-                  Please sign in with your Instructor ID Number and Institutional Email on the homepage to access the instructor dashboard.
-                </p>
-                <button
-                  onClick={() => setCurrentView('home')}
-                  className="ca-btn-primary text-xs"
-                >
-                  Go to Sign In
-                </button>
-              </div>
+              <InstructorLogin onLogin={handleLogin} />
             )}
           </>
         )}

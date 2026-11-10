@@ -109,7 +109,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           ) : (
             <button
-              onClick={() => setCurrentView('home')}
+              onClick={() => setCurrentView('instructor')}
               className="px-3 py-1.5 rounded-xl bg-ca-brand-soft border border-ca-border text-ca-brand hover:bg-ca-brand hover:text-ca-brand-ink font-bold text-xs flex items-center gap-1.5 transition-all"
             >
               <LogIn className="w-3.5 h-3.5" />
