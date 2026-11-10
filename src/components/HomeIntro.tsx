@@ -13,42 +13,42 @@ export const HomeIntro: React.FC<HomeIntroProps> = ({
   isInstructorLoggedIn,
 }) => {
   return (
-    <div className="space-y-14 py-6 sm:py-10 ca-fade-up">
-      <section className="relative max-w-4xl space-y-6 pt-4 sm:pt-8 pb-2">
-        <p className="text-xs sm:text-sm font-semibold text-ca-brand tracking-wide">
+    <div className="space-y-20 py-8 sm:py-14 ca-fade-up">
+      <section className="relative max-w-5xl space-y-7 pt-6 sm:pt-12 pb-4">
+        <p className="text-sm sm:text-base font-semibold text-ca-brand tracking-wide">
           College of Computing and Information Sciences • Caraga State University
         </p>
 
-        <h1 className="font-display text-3xl sm:text-5xl font-bold text-ca-ink leading-[1.15]">
+        <h1 className="font-display text-4xl sm:text-6xl lg:text-7xl font-bold text-ca-ink leading-[1.08] max-w-4xl">
           Live AI Source Code Detection for{' '}
           <span className="text-ca-brand">Laboratory Exams</span>
         </h1>
 
-        <p className="max-w-2xl text-sm sm:text-base leading-relaxed text-ca-muted">
+        <p className="max-w-2xl text-base sm:text-lg leading-relaxed text-ca-muted">
           CodeAuthentic supports exam integrity by helping instructors identify potentially
           AI-generated C, Java, and Python submissions in timed laboratory exams.
         </p>
 
-        <div className="flex flex-wrap items-center gap-3 pt-1">
-          <button onClick={onNavigateToInstructor} className="ca-btn-primary">
+        <div className="flex flex-wrap items-center gap-3 pt-2">
+          <button onClick={onNavigateToInstructor} className="ca-btn-primary text-base !px-6 !py-3.5">
             <span>{isInstructorLoggedIn ? 'Open Instructor Dashboard' : 'Instructor Sign In'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
 
-          <button onClick={onNavigateToStudent} className="ca-btn-secondary">
+          <button onClick={onNavigateToStudent} className="ca-btn-secondary text-base !px-6 !py-3.5">
             <Terminal className="w-4 h-4 text-ca-brand" />
             <span>Student Submission Portal</span>
           </button>
         </div>
       </section>
 
-      <section className="ca-panel p-6 sm:p-8 space-y-6 max-w-5xl">
-        <h2 className="text-xl font-bold font-display text-ca-ink flex items-center gap-2">
-          <Layers className="w-5 h-5 text-ca-brand" />
+      <section className="max-w-5xl space-y-8">
+        <h2 className="text-2xl sm:text-3xl font-bold font-display text-ca-ink flex items-center gap-3">
+          <Layers className="w-6 h-6 text-ca-brand" />
           <span>How it works</span>
         </h2>
 
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid sm:grid-cols-2 gap-8">
           {[
             {
               step: '01',
@@ -71,27 +71,22 @@ export const HomeIntro: React.FC<HomeIntroProps> = ({
               body: 'Live dashboard groups submissions into Low (< 0.40), Medium (0.40–0.70), and High (≥ 0.70) AI probability.',
             },
           ].map((item) => (
-            <div
-              key={item.step}
-              className="p-4 rounded-2xl bg-ca-bg-elevated border border-ca-border space-y-2"
-            >
-              <div className="w-8 h-8 rounded-lg bg-ca-brand-soft text-ca-brand font-bold flex items-center justify-center text-xs">
-                {item.step}
-              </div>
-              <h3 className="font-bold text-ca-ink text-sm">{item.title}</h3>
-              <p className="text-xs text-ca-muted">{item.body}</p>
+            <div key={item.step} className="space-y-3">
+              <div className="text-sm font-bold font-mono text-ca-brand">{item.step}</div>
+              <h3 className="font-bold text-ca-ink text-lg sm:text-xl font-display">{item.title}</h3>
+              <p className="text-sm sm:text-base text-ca-muted leading-relaxed">{item.body}</p>
             </div>
           ))}
         </div>
 
-        <div className="p-4 rounded-2xl bg-ca-brand-soft border border-ca-border text-xs text-ca-muted flex items-start gap-3">
+        <div className="pt-2 text-sm sm:text-base text-ca-muted flex items-start gap-3 max-w-3xl">
           <AlertTriangle className="w-5 h-5 text-ca-brand shrink-0 mt-0.5" />
-          <div>
-            <strong className="text-ca-brand block mb-0.5">Academic Integrity Standard:</strong>
+          <p>
+            <strong className="text-ca-brand">Academic Integrity Standard: </strong>
             Scores are probabilities to support instructor grading and manual code review, not
             proof of academic dishonesty. Code is treated strictly as plain text and is never
             executed or compiled.
-          </div>
+          </p>
         </div>
       </section>
     </div>
