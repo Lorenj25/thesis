@@ -48,7 +48,7 @@ export const HomeIntro: React.FC<HomeIntroProps> = ({
           <span>How it works</span>
         </h2>
 
-        <div className="grid sm:grid-cols-2 gap-8">
+        <div className="grid sm:grid-cols-2 gap-4 sm:gap-5">
           {[
             {
               step: '01',
@@ -71,11 +71,13 @@ export const HomeIntro: React.FC<HomeIntroProps> = ({
               body: 'Live dashboard groups submissions into Low (< 0.40), Medium (0.40–0.70), and High (≥ 0.70) AI probability.',
             },
           ].map((item) => (
-            <div key={item.step} className="space-y-3">
-              <div className="text-sm font-bold font-mono text-ca-brand">{item.step}</div>
+            <article key={item.step} className="ca-panel p-5 sm:p-6 space-y-3">
+              <div className="w-9 h-9 rounded-lg bg-ca-brand-soft text-ca-brand font-bold font-mono text-sm flex items-center justify-center">
+                {item.step}
+              </div>
               <h3 className="font-bold text-ca-ink text-lg sm:text-xl font-display">{item.title}</h3>
               <p className="text-sm sm:text-base text-ca-muted leading-relaxed">{item.body}</p>
-            </div>
+            </article>
           ))}
         </div>
 
