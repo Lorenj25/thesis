@@ -428,3 +428,41 @@ body {
 .ca-fade-up {
   animation: ca-fade-up 0.4s ease-out both;
 }
+
+/* Right mini sidebar drawer */
+.ca-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: var(--ca-overlay);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  animation: ca-fade-in 0.2s ease-out both;
+}
+
+.ca-drawer {
+  position: fixed;
+  top: 0.85rem;
+  right: 0.85rem;
+  bottom: 0.85rem;
+  z-index: 50;
+  width: min(18rem, calc(100vw - 1.7rem));
+  background: color-mix(in srgb, var(--ca-surface) 78%, transparent);
+  border: 1px solid var(--ca-border);
+  border-radius: 1.25rem;
+  box-shadow: var(--ca-shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  transform: translateX(calc(100% + 1.25rem));
+  transition: transform 0.28s ease;
+  pointer-events: none;
+}
+
+.ca-drawer.is-open {
+  transform: translateX(0);
+  pointer-events: auto;
+}
