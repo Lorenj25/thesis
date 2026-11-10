@@ -180,9 +180,9 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 py-2 min-h-[70vh]">
-      <aside className="lg:w-60 shrink-0">
-        <div className="lg:sticky lg:top-24 rounded-2xl border border-ca-border bg-ca-surface p-3 sm:p-4 flex flex-col gap-1.5 min-h-full">
+    <div className="flex flex-col lg:flex-row gap-6 py-2 lg:min-h-[calc(100vh-8rem)]">
+      <aside className="lg:w-64 shrink-0">
+        <div className="lg:sticky lg:top-[7.25rem] rounded-2xl border border-ca-border bg-ca-surface/95 backdrop-blur-md p-3 sm:p-4 flex flex-col gap-1.5 lg:min-h-[calc(100vh-8.5rem)] shadow-[var(--ca-shadow)]">
           <div className="px-2 pb-3 mb-1 border-b border-ca-border">
             <p className="text-[10px] font-bold uppercase tracking-wider text-ca-faint">Instructor</p>
             <p className="text-sm font-bold text-ca-ink font-display truncate">{instructor.name}</p>
@@ -234,93 +234,96 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
       <div className="flex-1 min-w-0 space-y-6">
         {section === 'dashboard' && (
           <div className="space-y-6 ca-fade-up">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-ca-border pb-6">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs uppercase font-mono px-2 py-0.5 rounded bg-ca-brand-soft text-ca-brand border border-ca-border font-bold">
-                    Faculty Instructor
-                  </span>
-                  <span className="text-xs text-ca-muted">ID: {instructor.idNumber}</span>
-                </div>
-                <h1 className="text-2xl sm:text-3xl font-bold font-display text-ca-ink mt-1">
-                  Exam Lobby Management Console
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold font-display text-ca-ink">
+                  Dashboard
                 </h1>
-                <p className="text-xs text-ca-muted">
+                <p className="text-sm text-ca-muted mt-1">
                   Overview of lobbies, uploads, and AI risk across your exam sessions.
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => setShowDatasetModal(true)}
-                  className="px-4 py-3 rounded-xl bg-ca-surface-2 hover:bg-ca-bg-elevated text-ca-ink border border-ca-border font-bold text-xs flex items-center gap-2 transition-all cursor-pointer"
+                  className="px-3.5 py-2.5 rounded-xl bg-ca-surface/95 hover:bg-ca-surface-hover text-ca-ink border border-ca-border text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer backdrop-blur-md"
                 >
                   <BookOpen className="w-4 h-4 text-ca-brand" />
-                  <span>Hugging Face Datasets</span>
+                  <span>Datasets</span>
                 </button>
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="px-5 py-3 rounded-xl bg-ca-brand hover:bg-ca-brand-hover text-ca-brand-ink font-black text-sm tracking-wide flex items-center gap-2 transition-all cursor-pointer"
-                >
-                  <Plus className="w-4 h-4 stroke-[3]" />
+                <button onClick={() => setShowCreateModal(true)} className="ca-btn-primary">
+                  <Plus className="w-4 h-4" />
                   <span>Generate New Lobby</span>
                 </button>
               </div>
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="p-4 rounded-2xl bg-ca-surface border border-ca-border">
-                <span className="text-[11px] font-bold text-ca-muted uppercase tracking-wider block">Lobbies</span>
-                <span className="mt-1 text-2xl font-black text-ca-ink font-mono">{lobbies.length}</span>
-              </div>
-              <div className="p-4 rounded-2xl bg-ca-surface border border-ca-border">
-                <span className="text-[11px] font-bold text-ca-ok uppercase tracking-wider block">Active</span>
-                <span className="mt-1 text-2xl font-black text-ca-ok font-mono">{activeLobbyCount}</span>
-              </div>
-              <div className="p-4 rounded-2xl bg-ca-surface border border-ca-border">
-                <span className="text-[11px] font-bold text-ca-brand uppercase tracking-wider block">Total Files</span>
-                <span className="mt-1 text-2xl font-black text-ca-brand font-mono">{submissions.length}</span>
-              </div>
-              <div className="p-4 rounded-2xl bg-ca-surface border border-ca-border">
-                <span className="text-[11px] font-bold text-ca-danger uppercase tracking-wider block">High Risk</span>
-                <span className="mt-1 text-2xl font-black text-ca-danger font-mono">{totalHighRisk}</span>
-              </div>
+              {[
+                { label: 'Lobbies', value: String(lobbies.length), valueClass: 'text-ca-ink' },
+                { label: 'Active', value: String(activeLobbyCount), valueClass: 'text-ca-ok' },
+                { label: 'Files', value: String(submissions.length), valueClass: 'text-ca-brand' },
+                { label: 'High risk', value: String(totalHighRisk), valueClass: 'text-ca-danger' },
+              ].map((stat) => (
+                <div
+                  key={stat.label}
+                  className="h-[5.5rem] p-3.5 rounded-xl border border-ca-border bg-ca-surface/95 backdrop-blur-md flex flex-col justify-between"
+                >
+                  <span className="text-[11px] font-medium text-ca-muted tracking-wide">{stat.label}</span>
+                  <span className={`text-2xl font-bold font-mono leading-none ${stat.valueClass}`}>
+                    {stat.value}
+                  </span>
+                </div>
+              ))}
             </div>
 
-            <div className="rounded-2xl border border-ca-border bg-ca-surface p-5 space-y-3">
+            <div className="rounded-2xl border border-ca-border bg-ca-surface/95 backdrop-blur-md p-5 space-y-4">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="text-sm font-bold text-ca-ink font-display">Quick open lobbies</h2>
+                <h2 className="text-sm font-semibold text-ca-ink font-display">Quick open lobbies</h2>
                 <button
                   type="button"
                   onClick={() => setSection('lobbies')}
-                  className="text-xs font-semibold text-ca-brand hover:underline cursor-pointer"
+                  className="text-sm font-semibold text-ca-brand hover:text-ca-brand-hover transition-colors cursor-pointer"
                 >
-                  View all
+                  View all →
                 </button>
               </div>
               {lobbies.length === 0 ? (
-                <p className="text-xs text-ca-muted">No lobbies yet. Generate one to start an exam session.</p>
+                <p className="text-sm text-ca-muted">No lobbies yet. Generate one to start an exam session.</p>
               ) : (
                 <div className="grid sm:grid-cols-2 gap-3">
-                  {lobbies.slice(0, 4).map((lobby) => (
-                    <button
-                      key={lobby.id}
-                      type="button"
-                      onClick={() => {
-                        selectLobby(lobby.id);
-                        setSection('lobbies');
-                      }}
-                      className="text-left p-3.5 rounded-xl border border-ca-border bg-ca-bg hover:border-ca-brand transition-colors cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-black text-ca-brand bg-ca-brand-soft px-1.5 py-0.5 rounded border border-ca-border">
-                          {lobby.code}
-                        </span>
-                        <span className="text-xs font-bold text-ca-ink truncate">{lobby.subject}</span>
-                      </div>
-                      <p className="text-[11px] text-ca-muted mt-1 line-clamp-1">{lobby.title}</p>
-                    </button>
-                  ))}
+                  {lobbies.slice(0, 4).map((lobby) => {
+                    const isLocked = lobby.status === 'LOCKED';
+                    return (
+                      <button
+                        key={lobby.id}
+                        type="button"
+                        onClick={() => {
+                          selectLobby(lobby.id);
+                          setSection('lobbies');
+                        }}
+                        className="text-left p-3.5 rounded-xl border border-ca-border bg-ca-surface-2/80 hover:border-ca-brand transition-colors cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="font-mono text-[11px] font-bold text-ca-brand shrink-0">
+                            {lobby.code}
+                          </span>
+                          <span className="text-sm font-semibold text-ca-ink truncate min-w-0 flex-1">
+                            {lobby.subject}
+                          </span>
+                          <span
+                            className={`shrink-0 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md ${
+                              isLocked ? 'bg-ca-bg-elevated text-ca-muted' : 'bg-ca-ok-soft text-ca-ok'
+                            }`}
+                          >
+                            {lobby.status}
+                          </span>
+                        </div>
+                        <p className="text-xs text-ca-muted mt-1.5 line-clamp-1">{lobby.title}</p>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -332,182 +335,195 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h1 className="text-2xl font-bold font-display text-ca-ink">Examination Lobbies</h1>
-                <p className="text-xs text-ca-muted">Create lobbies, share codes, and lock exam access.</p>
+                <p className="text-sm text-ca-muted">Create lobbies, share codes, and lock exam access.</p>
               </div>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="px-5 py-3 rounded-xl bg-ca-brand hover:bg-ca-brand-hover text-ca-brand-ink font-black text-sm flex items-center gap-2 self-start transition-all cursor-pointer"
+                className="ca-btn-primary self-start"
               >
-                <Plus className="w-4 h-4 stroke-[3]" />
+                <Plus className="w-4 h-4" />
                 <span>Generate New Lobby</span>
               </button>
             </div>
 
-            <div className="grid lg:grid-cols-12 gap-6 items-start">
-              <div className="lg:col-span-4 rounded-2xl border border-ca-border bg-ca-surface p-4 space-y-3">
-                <h2 className="text-xs font-bold uppercase tracking-wider text-ca-muted">
-                  Examination Lobbies ({lobbies.length})
+            <div className="grid lg:grid-cols-12 gap-5 items-start">
+              <div className="lg:col-span-4 rounded-2xl border border-ca-border bg-ca-surface/95 backdrop-blur-md p-4 space-y-3">
+                <h2 className="text-xs font-semibold tracking-wide text-ca-muted">
+                  Lobbies · {lobbies.length}
                 </h2>
                 <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
-                  {lobbies.map((lobby) => {
-                    const isSelected = activeLobby && activeLobby.id === lobby.id;
-                    const isLocked = lobby.status === 'LOCKED';
-                    const subCount = submissions.filter((s) => s.lobbyId === lobby.id).length;
+                  {lobbies.length === 0 ? (
+                    <p className="text-sm text-ca-muted py-6 text-center">No lobbies yet.</p>
+                  ) : (
+                    lobbies.map((lobby) => {
+                      const isSelected = activeLobby && activeLobby.id === lobby.id;
+                      const isLocked = lobby.status === 'LOCKED';
+                      const subCount = submissions.filter((s) => s.lobbyId === lobby.id).length;
 
-                    return (
-                      <div
-                        key={lobby.id}
-                        onClick={() => selectLobby(lobby.id)}
-                        className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-ca-bg border-ca-brand'
-                            : 'bg-ca-bg-elevated border-ca-border hover:border-ca-border-strong hover:bg-ca-bg'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-mono text-xs font-black text-ca-brand bg-ca-brand-soft px-1.5 py-0.5 rounded border border-ca-border">
-                                {lobby.code}
-                              </span>
-                              <span className="text-xs font-bold text-ca-ink truncate max-w-[170px]">
-                                {lobby.subject}
-                              </span>
-                            </div>
-                            <p className="text-[11px] text-ca-muted mt-1 line-clamp-1">{lobby.title}</p>
+                      return (
+                        <button
+                          key={lobby.id}
+                          type="button"
+                          onClick={() => selectLobby(lobby.id)}
+                          className={`w-full text-left p-3.5 rounded-xl border transition-colors cursor-pointer ${
+                            isSelected
+                              ? 'bg-ca-brand-soft border-ca-brand'
+                              : 'bg-ca-surface-2/80 border-ca-border hover:border-ca-border-strong'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="font-mono text-[11px] font-bold text-ca-brand shrink-0">
+                              {lobby.code}
+                            </span>
+                            <span className="text-sm font-semibold text-ca-ink truncate min-w-0 flex-1">
+                              {lobby.subject}
+                            </span>
+                            <span
+                              className={`shrink-0 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md whitespace-nowrap ${
+                                isLocked
+                                  ? 'bg-ca-bg-elevated text-ca-muted'
+                                  : 'bg-ca-ok-soft text-ca-ok'
+                              }`}
+                            >
+                              {lobby.status}
+                            </span>
                           </div>
-                          <span
-                            className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                              isLocked
-                                ? 'bg-ca-bg-elevated text-ca-muted border border-ca-border-strong'
-                                : 'bg-ca-ok-soft text-ca-ok border border-ca-border'
-                            }`}
-                          >
-                            {lobby.status}
-                          </span>
-                        </div>
-                        <div className="mt-2.5 pt-2 border-t border-ca-border/80 flex items-center justify-between text-[11px] text-ca-muted font-mono">
-                          <span>Max {lobby.maxStudents} Students</span>
-                          <span>{subCount} Files</span>
-                        </div>
-                      </div>
-                    );
-                  })}
+                          <p className="text-xs text-ca-muted mt-1.5 line-clamp-1">{lobby.title}</p>
+                          <div className="mt-3 flex items-center justify-between text-[11px] text-ca-faint">
+                            <span>Max {lobby.maxStudents}</span>
+                            <span>{subCount} files</span>
+                          </div>
+                        </button>
+                      );
+                    })
+                  )}
                 </div>
               </div>
 
               <div className="lg:col-span-8">
                 {activeLobby ? (
-                  <div className="rounded-3xl border border-ca-border bg-ca-surface p-6 space-y-6">
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-ca-border pb-5">
-                      <div className="space-y-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-xs font-mono font-black text-ca-brand bg-ca-brand-soft border border-ca-border px-2.5 py-1 rounded-lg">
-                            CODE: {activeLobby.code}
-                          </span>
-                          <span
-                            className={`text-xs font-bold uppercase px-2.5 py-1 rounded-lg border ${
+                  <div className="rounded-2xl border border-ca-border bg-ca-surface/95 backdrop-blur-md p-5 sm:p-6 space-y-6">
+                    <div className="space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                        <div className="min-w-0 space-y-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-mono text-xs font-bold text-ca-brand">
+                              {activeLobby.code}
+                            </span>
+                            <span
+                              className={`text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md ${
+                                activeLobby.status === 'ACTIVE'
+                                  ? 'bg-ca-ok-soft text-ca-ok'
+                                  : 'bg-ca-bg-elevated text-ca-muted'
+                              }`}
+                            >
+                              {activeLobby.status}
+                            </span>
+                          </div>
+                          <h2 className="text-2xl font-bold font-display text-ca-ink leading-tight">
+                            {activeLobby.subject}
+                          </h2>
+                          <p className="text-sm text-ca-muted">{activeLobby.title}</p>
+                          <p className="text-xs text-ca-faint">Up to 3 uploads per student</p>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2 shrink-0">
+                          <button
+                            onClick={handleCopyCode}
+                            className="px-3 py-2 rounded-xl bg-ca-surface-2 hover:bg-ca-surface-hover text-ca-ink border border-ca-border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                          >
+                            {copiedCode ? <Check className="w-3.5 h-3.5 text-ca-ok" /> : <Copy className="w-3.5 h-3.5 text-ca-brand" />}
+                            <span>{copiedCode ? 'Copied' : 'Copy code'}</span>
+                          </button>
+                          <button
+                            onClick={handleCopyLink}
+                            className="px-3 py-2 rounded-xl bg-ca-surface-2 hover:bg-ca-surface-hover text-ca-ink border border-ca-border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                          >
+                            {copiedLink ? <Check className="w-3.5 h-3.5 text-ca-ok" /> : <ExternalLink className="w-3.5 h-3.5 text-ca-brand" />}
+                            <span>{copiedLink ? 'Copied' : 'Copy link'}</span>
+                          </button>
+                          <button
+                            onClick={() => onToggleLock(activeLobby.id)}
+                            className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border ${
                               activeLobby.status === 'ACTIVE'
-                                ? 'bg-ca-ok-soft text-ca-ok border-ca-border'
-                                : 'bg-ca-bg-elevated text-ca-muted border-ca-border-strong'
+                                ? 'bg-ca-danger-soft text-ca-danger border-transparent'
+                                : 'bg-ca-ok-soft text-ca-ok border-transparent'
                             }`}
                           >
-                            {activeLobby.status}
-                          </span>
-                          <span className="text-xs px-2.5 py-1 rounded-lg bg-ca-bg-elevated text-ca-muted border border-ca-border-strong font-mono">
-                            Up to 3 Uploads / Student
-                          </span>
+                            {activeLobby.status === 'ACTIVE' ? (
+                              <>
+                                <Lock className="w-3.5 h-3.5" />
+                                <span>Lock</span>
+                              </>
+                            ) : (
+                              <>
+                                <Unlock className="w-3.5 h-3.5" />
+                                <span>Unlock</span>
+                              </>
+                            )}
+                          </button>
                         </div>
-                        <h2 className="text-xl sm:text-2xl font-black text-ca-ink pt-1">{activeLobby.subject}</h2>
-                        <p className="text-xs text-ca-muted">{activeLobby.title}</p>
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-2">
-                        <button
-                          onClick={handleCopyCode}
-                          className="px-3 py-2 rounded-xl bg-ca-bg hover:bg-ca-bg-elevated text-ca-ink border border-ca-border text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
-                        >
-                          {copiedCode ? <Check className="w-3.5 h-3.5 text-ca-ok" /> : <Copy className="w-3.5 h-3.5 text-ca-brand" />}
-                          <span>{copiedCode ? 'Code Copied' : 'Copy Code'}</span>
-                        </button>
-                        <button
-                          onClick={handleCopyLink}
-                          className="px-3 py-2 rounded-xl bg-ca-bg hover:bg-ca-bg-elevated text-ca-ink border border-ca-border text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
-                        >
-                          {copiedLink ? <Check className="w-3.5 h-3.5 text-ca-ok" /> : <ExternalLink className="w-3.5 h-3.5 text-ca-brand" />}
-                          <span>{copiedLink ? 'Link Copied' : 'Copy Link'}</span>
-                        </button>
-                        <button
-                          onClick={() => onToggleLock(activeLobby.id)}
-                          className={`px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
-                            activeLobby.status === 'ACTIVE'
-                              ? 'bg-ca-danger-soft text-ca-danger border border-ca-border'
-                              : 'bg-ca-ok-soft text-ca-ok border border-ca-border'
-                          }`}
-                        >
-                          {activeLobby.status === 'ACTIVE' ? (
-                            <>
-                              <Lock className="w-3.5 h-3.5" />
-                              <span>Lock Lobby</span>
-                            </>
-                          ) : (
-                            <>
-                              <Unlock className="w-3.5 h-3.5" />
-                              <span>Unlock Lobby</span>
-                            </>
-                          )}
-                        </button>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      <div className="p-3.5 rounded-2xl bg-ca-bg border border-ca-border">
-                        <span className="text-[11px] font-bold text-ca-muted uppercase tracking-wider block">Students Joined</span>
-                        <div className="mt-1 flex items-baseline gap-1">
-                          <span className="text-2xl font-black text-ca-ink font-mono">{uniqueStudents}</span>
-                          <span className="text-xs text-ca-faint font-mono">/ {activeLobby.maxStudents}</span>
+                      {[
+                        {
+                          label: 'Students',
+                          value: String(uniqueStudents),
+                          unit: `/ ${activeLobby.maxStudents}`,
+                          valueClass: 'text-ca-ink',
+                        },
+                        {
+                          label: 'Files',
+                          value: String(lobbySubmissions.length),
+                          unit: 'uploaded',
+                          valueClass: 'text-ca-brand',
+                        },
+                        {
+                          label: 'High risk',
+                          value: String(highRiskCount),
+                          unit: '≥ 70%',
+                          valueClass: 'text-ca-danger',
+                        },
+                        {
+                          label: 'Med / Low',
+                          value: `${mediumRiskCount} / ${lowRiskCount}`,
+                          unit: 'M / L',
+                          valueClass: 'text-ca-ink',
+                        },
+                      ].map((stat) => (
+                        <div
+                          key={stat.label}
+                          className="h-[5.5rem] p-3.5 rounded-xl bg-ca-surface-2/90 border border-ca-border flex flex-col justify-between"
+                        >
+                          <span className="text-[11px] font-medium text-ca-muted tracking-wide">
+                            {stat.label}
+                          </span>
+                          <div className="flex items-baseline gap-1.5">
+                            <span className={`text-2xl font-bold font-mono leading-none ${stat.valueClass}`}>
+                              {stat.value}
+                            </span>
+                            <span className="text-[11px] text-ca-faint">{stat.unit}</span>
+                          </div>
                         </div>
-                      </div>
-                      <div className="p-3.5 rounded-2xl bg-ca-bg border border-ca-border">
-                        <span className="text-[11px] font-bold text-ca-muted uppercase tracking-wider block">Total Files</span>
-                        <div className="mt-1 flex items-baseline gap-1">
-                          <span className="text-2xl font-black text-ca-brand font-mono">{lobbySubmissions.length}</span>
-                          <span className="text-xs text-ca-faint">uploaded</span>
-                        </div>
-                      </div>
-                      <div className="p-3.5 rounded-2xl bg-ca-bg border border-ca-border">
-                        <span className="text-[11px] font-bold text-ca-danger uppercase tracking-wider block">High AI Risk</span>
-                        <div className="mt-1 flex items-baseline gap-1">
-                          <span className="text-2xl font-black text-ca-danger font-mono">{highRiskCount}</span>
-                          <span className="text-xs text-ca-faint">(&ge; 70%)</span>
-                        </div>
-                      </div>
-                      <div className="p-3.5 rounded-2xl bg-ca-bg border border-ca-border">
-                        <span className="text-[11px] font-bold text-ca-brand uppercase tracking-wider block">Med / Low Risk</span>
-                        <div className="mt-1 flex items-baseline gap-2">
-                          <span className="text-xl font-black text-ca-brand font-mono">{mediumRiskCount}M</span>
-                          <span className="text-xl font-black text-ca-ok font-mono">{lowRiskCount}L</span>
-                        </div>
-                      </div>
+                      ))}
                     </div>
 
                     <button
                       type="button"
                       onClick={() => setSection('submissions')}
-                      className="text-xs font-semibold text-ca-brand hover:underline cursor-pointer"
+                      className="text-sm font-semibold text-ca-brand hover:text-ca-brand-hover transition-colors cursor-pointer"
                     >
-                      Open live student submissions for this lobby →
+                      Open live student submissions →
                     </button>
                   </div>
                 ) : (
-                  <div className="p-12 text-center rounded-3xl border border-ca-border bg-ca-surface text-ca-muted">
-                    <h3 className="text-lg font-bold text-ca-ink mb-2">No Lobbies Found</h3>
-                    <p className="text-xs mb-4">Click Generate New Lobby to create an exam session.</p>
-                    <button
-                      onClick={() => setShowCreateModal(true)}
-                      className="px-5 py-2.5 rounded-xl bg-ca-brand text-ca-brand-ink font-bold text-xs cursor-pointer"
-                    >
-                      Create Exam Lobby
+                  <div className="p-12 text-center rounded-2xl border border-ca-border bg-ca-surface/95 backdrop-blur-md text-ca-muted">
+                    <h3 className="text-lg font-bold font-display text-ca-ink mb-2">No lobbies yet</h3>
+                    <p className="text-sm mb-5">Generate a lobby to start an exam session.</p>
+                    <button onClick={() => setShowCreateModal(true)} className="ca-btn-primary mx-auto">
+                      Create exam lobby
                     </button>
                   </div>
                 )}

@@ -38,11 +38,6 @@ export default function App() {
     setTheme(savedTheme);
     saveStoredTheme(savedTheme);
 
-    const savedInstructor = getStoredInstructor();
-    if (savedInstructor) {
-      setInstructor(savedInstructor);
-    }
-
     const savedLobbies = getStoredLobbies();
     setLobbies(savedLobbies);
 
@@ -55,6 +50,14 @@ export default function App() {
     if (codeParam) {
       setInitialStudentLobbyCode(codeParam);
       setCurrentView('student');
+      return;
+    }
+
+    // Restore instructor session into the console (not the public landing)
+    const savedInstructor = getStoredInstructor();
+    if (savedInstructor) {
+      setInstructor(savedInstructor);
+      setCurrentView('instructor');
     }
   }, []);
 
@@ -184,7 +187,7 @@ export default function App() {
           <section className="ca-hero ca-hero--app">
             <img src={heroHall} alt="" className="ca-hero__media" aria-hidden="true" />
             <div className="ca-hero__scrim" aria-hidden="true" />
-            <div className="ca-hero__content max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-8 w-full">
+            <div className="ca-hero__content max-w-7xl mx-auto px-4 sm:px-6 w-full">
               <InstructorDashboard
                 instructor={instructor}
                 lobbies={lobbies}
