@@ -262,27 +262,27 @@ body {
 .dark .ca-hero--app {
   --ca-hero-fog-haze: radial-gradient(
     ellipse 65% 50% at 80% 70%,
-    rgba(14, 12, 10, 0.35),
+    rgba(14, 12, 10, 0.28),
     transparent 70%
   );
   --ca-hero-fog-side: linear-gradient(
     90deg,
-    rgba(14, 12, 10, 0.82) 0%,
-    rgba(14, 12, 10, 0.55) 45%,
-    rgba(14, 12, 10, 0.28) 100%
+    rgba(14, 12, 10, 0.72) 0%,
+    rgba(14, 12, 10, 0.45) 45%,
+    rgba(14, 12, 10, 0.2) 100%
   );
   --ca-hero-fog-bottom: linear-gradient(
     180deg,
-    rgba(14, 12, 10, 0.25) 0%,
-    rgba(14, 12, 10, 0.55) 55%,
-    rgba(14, 12, 10, 0.88) 100%
+    rgba(14, 12, 10, 0.18) 0%,
+    rgba(14, 12, 10, 0.45) 55%,
+    rgba(14, 12, 10, 0.78) 100%
   );
 }
 
-/* Kill warm/orange cast from instructor BG in dark mode */
+/* Slight BG lift in dark mode — keep it subtle */
 .dark .ca-hero--app .ca-hero__media,
 .dark .ca-hero--login .ca-hero__media {
-  filter: saturate(0.55) brightness(0.78);
+  filter: saturate(0.68) brightness(0.84);
 }
 
 .dark .ca-hero--app .ca-hero__scrim::before,
@@ -290,7 +290,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(14, 12, 10, 0.35);
+  background: rgba(14, 12, 10, 0.22);
   pointer-events: none;
 }
 
