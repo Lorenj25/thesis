@@ -20,10 +20,16 @@ export const Navbar: React.FC<NavbarProps> = ({
   theme,
   onToggleTheme,
 }) => {
+  const navBtn = (active: boolean) =>
+    `px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+      active
+        ? 'bg-ca-brand text-ca-brand-ink font-bold'
+        : 'text-ca-muted hover:text-ca-ink'
+    }`;
+
   return (
-    <header className="sticky top-0 z-40 border-b transition-colors bg-stone-950/90 dark:bg-stone-950/95 border-stone-800 text-stone-100 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-ca-border bg-ca-navbar text-ca-ink backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
-        {/* Logo and Brand */}
         <div
           onClick={() => setCurrentView('home')}
           className="flex items-center gap-3 cursor-pointer group"
@@ -35,87 +41,68 @@ export const Navbar: React.FC<NavbarProps> = ({
           />
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-extrabold tracking-tight text-lg text-white group-hover:text-orange-400 transition-colors">
-                Code<span className="text-orange-500">Authentic</span>
+              <span className="font-extrabold tracking-tight text-lg text-ca-ink group-hover:text-ca-brand transition-colors">
+                Code<span className="text-ca-brand">Authentic</span>
               </span>
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/40">
+              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-ca-brand-soft text-ca-brand border border-ca-border">
                 CCIS CSU
               </span>
             </div>
-            <p className="text-[11px] text-stone-400 font-medium hidden sm:block">
+            <p className="text-[11px] text-ca-muted font-medium hidden sm:block">
               AI Code Detector for Lab Examinations
             </p>
           </div>
         </div>
 
-        {/* Center View Selector */}
-        <nav className="flex items-center bg-stone-900/90 p-1 rounded-xl border border-stone-800 text-xs sm:text-sm font-semibold">
-          <button
-            onClick={() => setCurrentView('home')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
-              currentView === 'home'
-                ? 'bg-orange-600 text-stone-950 font-bold shadow-md shadow-orange-600/20'
-                : 'text-stone-400 hover:text-white'
-            }`}
-          >
-            Home:
+        <nav className="flex items-center bg-ca-bg-elevated p-1 rounded-xl border border-ca-border text-xs sm:text-sm font-semibold">
+          <button onClick={() => setCurrentView('home')} className={navBtn(currentView === 'home')}>
+            Home
           </button>
           <button
             onClick={() => setCurrentView('instructor')}
-            className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
-              currentView === 'instructor'
-                ? 'bg-orange-600 text-stone-950 font-bold shadow-md shadow-orange-600/20'
-                : 'text-stone-400 hover:text-white'
-            }`}
+            className={navBtn(currentView === 'instructor')}
           >
             <User className="w-3.5 h-3.5" />
-            <span>Instructor Portal</span>
+            <span>Instructor</span>
           </button>
           <button
             onClick={() => setCurrentView('student')}
-            className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
-              currentView === 'student'
-                ? 'bg-orange-600 text-stone-950 font-bold shadow-md shadow-orange-600/20'
-                : 'text-stone-400 hover:text-white'
-            }`}
+            className={navBtn(currentView === 'student')}
           >
             <Terminal className="w-3.5 h-3.5" />
-            <span>Student Upload</span>
+            <span>Student</span>
           </button>
         </nav>
 
-        {/* Right Actions: Dark/Light Mode + Instructor Profile */}
         <div className="flex items-center gap-2.5">
-          {/* Dark / Light Mode Toggle */}
           <button
             onClick={onToggleTheme}
             aria-label="Toggle Dark/Light Mode"
             title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
-            className="p-2 rounded-xl border border-stone-800 bg-stone-900 text-stone-300 hover:text-orange-400 hover:border-orange-500/50 transition-all cursor-pointer"
+            className="p-2 rounded-xl border border-ca-border bg-ca-surface text-ca-muted hover:text-ca-brand hover:border-ca-brand transition-all cursor-pointer"
           >
             {theme === 'dark' ? (
-              <Sun className="w-4 h-4 text-orange-400" />
+              <Sun className="w-4 h-4 text-ca-brand" />
             ) : (
-              <Moon className="w-4 h-4 text-stone-300" />
+              <Moon className="w-4 h-4 text-ca-muted" />
             )}
           </button>
 
-          {/* Instructor Session Badge */}
           {instructor ? (
-            <div className="flex items-center gap-2 bg-stone-900 border border-stone-800 px-3 py-1.5 rounded-xl">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="flex items-center gap-2 bg-ca-surface border border-ca-border px-3 py-1.5 rounded-xl">
+              <div className="w-2 h-2 rounded-full bg-ca-ok animate-pulse" />
               <div className="text-left hidden md:block">
-                <div className="text-xs font-bold text-stone-200 leading-tight">
+                <div className="text-xs font-bold text-ca-ink leading-tight">
                   {instructor.name}
                 </div>
-                <div className="text-[10px] text-orange-400 font-mono">
+                <div className="text-[10px] text-ca-brand font-mono">
                   {instructor.idNumber}
                 </div>
               </div>
               <button
                 onClick={onLogout}
                 title="Sign out of instructor account"
-                className="p-1 text-stone-400 hover:text-rose-400 transition-colors ml-1"
+                className="p-1 text-ca-muted hover:text-ca-danger transition-colors ml-1"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -123,7 +110,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           ) : (
             <button
               onClick={() => setCurrentView('home')}
-              className="px-3 py-1.5 rounded-xl bg-orange-600/20 border border-orange-500/40 text-orange-400 hover:bg-orange-600 hover:text-stone-950 font-bold text-xs flex items-center gap-1.5 transition-all"
+              className="px-3 py-1.5 rounded-xl bg-ca-brand-soft border border-ca-border text-ca-brand hover:bg-ca-brand hover:text-ca-brand-ink font-bold text-xs flex items-center gap-1.5 transition-all"
             >
               <LogIn className="w-3.5 h-3.5" />
               <span>Instructor Login</span>

@@ -142,14 +142,7 @@ export default function App() {
   };
 
   return (
-    <div
-      className={`min-h-screen flex flex-col font-sans transition-colors duration-200 ${
-        theme === 'dark'
-          ? 'bg-stone-950 text-stone-100 dark'
-          : 'bg-stone-50 text-stone-900'
-      }`}
-    >
-      {/* Universal Orange & Black Header */}
+    <div className="ca-page flex flex-col font-sans transition-colors duration-200">
       <Navbar
         currentView={currentView}
         setCurrentView={setCurrentView}
@@ -159,7 +152,6 @@ export default function App() {
         onToggleTheme={handleToggleTheme}
       />
 
-      {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
         {currentView === 'home' && (
           <HomeIntro
@@ -189,16 +181,16 @@ export default function App() {
               />
             ) : (
               <div className="py-12 text-center max-w-md mx-auto space-y-4">
-                <div className="w-16 h-16 rounded-3xl bg-orange-600/10 text-orange-500 border border-orange-500/20 flex items-center justify-center mx-auto text-2xl font-black">
+                <div className="w-16 h-16 rounded-3xl bg-ca-brand-soft text-ca-brand border border-ca-border flex items-center justify-center mx-auto text-2xl font-black">
                   !
                 </div>
-                <h2 className="text-xl font-black text-stone-100">Faculty Authentication Required</h2>
-                <p className="text-xs text-stone-400">
+                <h2 className="text-xl font-black text-ca-ink font-display">Faculty Authentication Required</h2>
+                <p className="text-xs text-ca-muted">
                   Please sign in with your Instructor ID Number and Institutional Email on the homepage to access the instructor dashboard.
                 </p>
                 <button
                   onClick={() => setCurrentView('home')}
-                  className="px-6 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-stone-950 font-bold text-xs"
+                  className="ca-btn-primary text-xs"
                 >
                   Go to Sign In
                 </button>
@@ -217,16 +209,15 @@ export default function App() {
         )}
       </main>
 
-      {/* Universal Footer */}
-      <footer className="border-t border-stone-800 bg-stone-950 py-6 px-4 text-center text-xs text-stone-500">
+      <footer className="border-t border-ca-border bg-ca-surface py-6 px-4 text-center text-xs text-ca-faint">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="font-extrabold text-stone-300">
-              Code<span className="text-orange-500">Authentic</span>
+            <span className="font-extrabold text-ca-ink">
+              Code<span className="text-ca-brand">Authentic</span>
             </span>
             <span>• CCIS, Caraga State University</span>
           </div>
-          <div className="text-[11px] text-stone-400">
+          <div className="text-[11px] text-ca-muted">
             Frozen CodeBERT 770-dim feature extractor • C, Java, Python support • Max 3 files/student
           </div>
         </div>

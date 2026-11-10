@@ -1,0 +1,274 @@
+/*
+ * CodeAuthentic — global design tokens
+ * Light = :root | Dark = html.dark
+ * Use Tailwind ca-* utilities (bg-ca-bg, text-ca-ink, border-ca-border, …)
+ * instead of hardcoded stone/orange color classes.
+ */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* -------------------------------------------------------------------------- */
+/* Semantic tokens                                                            */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  /* Surfaces */
+  --ca-bg: #ece8e1;
+  --ca-bg-elevated: #e3ddd3;
+  --ca-surface: #faf8f5;
+  --ca-surface-2: #ffffff;
+  --ca-surface-hover: #f3efe8;
+
+  /* Text */
+  --ca-ink: #1a1612;
+  --ca-muted: #6b635a;
+  --ca-faint: #9a9186;
+
+  /* Borders */
+  --ca-border: #d6cfc3;
+  --ca-border-strong: #b9b0a3;
+
+  /* Brand (CSU / CodeAuthentic orange) */
+  --ca-brand: #c2410c;
+  --ca-brand-hover: #9a3412;
+  --ca-brand-soft: rgba(194, 65, 12, 0.12);
+  --ca-brand-ink: #fff7ed;
+
+  /* Status */
+  --ca-ok: #047857;
+  --ca-ok-soft: rgba(4, 120, 87, 0.12);
+  --ca-warn: #b45309;
+  --ca-warn-soft: rgba(180, 83, 9, 0.12);
+  --ca-danger: #be123c;
+  --ca-danger-soft: rgba(190, 18, 60, 0.12);
+
+  /* Overlay / chrome */
+  --ca-overlay: rgba(26, 22, 18, 0.55);
+  --ca-navbar: rgba(250, 248, 245, 0.92);
+  --ca-shadow: 0 12px 40px rgba(26, 22, 18, 0.08);
+
+  /* Atmosphere */
+  --ca-wash-a: rgba(194, 65, 12, 0.1);
+  --ca-wash-b: rgba(180, 83, 9, 0.07);
+}
+
+.dark {
+  --ca-bg: #0e0c0a;
+  --ca-bg-elevated: #161310;
+  --ca-surface: #1a1612;
+  --ca-surface-2: #221e19;
+  --ca-surface-hover: #2a241e;
+
+  --ca-ink: #f5f0e8;
+  --ca-muted: #a39a8e;
+  --ca-faint: #6f675e;
+
+  --ca-border: #322c25;
+  --ca-border-strong: #4a4238;
+
+  --ca-brand: #ea580c;
+  --ca-brand-hover: #f97316;
+  --ca-brand-soft: rgba(234, 88, 12, 0.16);
+  --ca-brand-ink: #0e0c0a;
+
+  --ca-ok: #34d399;
+  --ca-ok-soft: rgba(52, 211, 153, 0.14);
+  --ca-warn: #fb923c;
+  --ca-warn-soft: rgba(251, 146, 60, 0.14);
+  --ca-danger: #fb7185;
+  --ca-danger-soft: rgba(251, 113, 133, 0.14);
+
+  --ca-overlay: rgba(0, 0, 0, 0.72);
+  --ca-navbar: rgba(14, 12, 10, 0.92);
+  --ca-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+
+  --ca-wash-a: rgba(234, 88, 12, 0.16);
+  --ca-wash-b: rgba(120, 53, 15, 0.22);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Tailwind v4 theme bridge → utilities like bg-ca-bg, text-ca-ink            */
+/* -------------------------------------------------------------------------- */
+
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Syne", "DM Sans", ui-sans-serif, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --color-ca-bg: var(--ca-bg);
+  --color-ca-bg-elevated: var(--ca-bg-elevated);
+  --color-ca-surface: var(--ca-surface);
+  --color-ca-surface-2: var(--ca-surface-2);
+  --color-ca-surface-hover: var(--ca-surface-hover);
+
+  --color-ca-ink: var(--ca-ink);
+  --color-ca-muted: var(--ca-muted);
+  --color-ca-faint: var(--ca-faint);
+
+  --color-ca-border: var(--ca-border);
+  --color-ca-border-strong: var(--ca-border-strong);
+
+  --color-ca-brand: var(--ca-brand);
+  --color-ca-brand-hover: var(--ca-brand-hover);
+  --color-ca-brand-soft: var(--ca-brand-soft);
+  --color-ca-brand-ink: var(--ca-brand-ink);
+
+  --color-ca-ok: var(--ca-ok);
+  --color-ca-ok-soft: var(--ca-ok-soft);
+  --color-ca-warn: var(--ca-warn);
+  --color-ca-warn-soft: var(--ca-warn-soft);
+  --color-ca-danger: var(--ca-danger);
+  --color-ca-danger-soft: var(--ca-danger-soft);
+
+  --color-ca-overlay: var(--ca-overlay);
+  --color-ca-navbar: var(--ca-navbar);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Base                                                                       */
+/* -------------------------------------------------------------------------- */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  background-color: var(--ca-bg);
+  color: var(--ca-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Page atmosphere (no flat single-color fill) */
+.ca-page {
+  min-height: 100vh;
+  background-color: var(--ca-bg);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 10% -10%, var(--ca-wash-a), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 95% 5%, var(--ca-wash-b), transparent 50%);
+  color: var(--ca-ink);
+}
+
+/* Shared UI primitives — theme-aware, no per-mode class forks */
+.ca-panel {
+  background: var(--ca-surface);
+  border: 1px solid var(--ca-border);
+  border-radius: 1.25rem;
+  box-shadow: var(--ca-shadow);
+}
+
+.ca-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.875rem;
+  background: var(--ca-bg-elevated);
+  border: 1px solid var(--ca-border);
+  color: var(--ca-ink);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ca-input::placeholder {
+  color: var(--ca-faint);
+}
+
+.ca-input:focus {
+  border-color: var(--ca-brand);
+  box-shadow: 0 0 0 3px var(--ca-brand-soft);
+}
+
+.ca-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  border-radius: 0.875rem;
+  background: var(--ca-brand);
+  color: var(--ca-brand-ink);
+  font-weight: 700;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.12s ease, opacity 0.12s ease;
+}
+
+.ca-btn-primary:hover:not(:disabled) {
+  background: var(--ca-brand-hover);
+}
+
+.ca-btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.ca-btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ca-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  border-radius: 0.875rem;
+  background: var(--ca-surface-2);
+  color: var(--ca-ink);
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: 1px solid var(--ca-border);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.ca-btn-secondary:hover {
+  border-color: var(--ca-brand);
+  background: var(--ca-brand-soft);
+}
+
+.ca-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.ca-scroll::-webkit-scrollbar-thumb {
+  background: var(--ca-border-strong);
+  border-radius: 999px;
+}
+
+.ca-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@keyframes ca-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ca-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ca-fade-in {
+  animation: ca-fade-in 0.25s ease-out both;
+}
+
+.ca-fade-up {
+  animation: ca-fade-up 0.4s ease-out both;
+}
