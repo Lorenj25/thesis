@@ -163,6 +163,13 @@ if FRONTEND_DIR.exists():
     if js_dir.exists():
         app.mount("/js", StaticFiles(directory=str(js_dir)), name="js")
 
+    @app.get("/favicon.png")
+    def serve_favicon():
+        favicon = FRONTEND_DIR / "favicon.png"
+        if favicon.exists():
+            return FileResponse(str(favicon), media_type="image/png")
+        raise HTTPException(status_code=404, detail="Favicon not found")
+
     @app.get("/", response_class=HTMLResponse)
     def serve_index():
         index_file = FRONTEND_DIR / "index.html"
