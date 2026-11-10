@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Plus,
   Copy,
@@ -18,6 +18,7 @@ import {
   LogOut,
   Sun,
   Moon,
+  ChevronDown,
 } from 'lucide-react';
 import { Instructor, Lobby, RiskLevel, Submission, Theme } from '../types';
 import { CodeModal } from './CodeModal';
@@ -69,8 +70,30 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
   const [riskFilter, setRiskFilter] = useState<'All' | RiskLevel>('All');
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [lobbyMenuOpen, setLobbyMenuOpen] = useState(false);
+  const lobbyMenuRef = useRef<HTMLDivElement>(null);
 
   const activeLobby = lobbies.find((l) => l.id === selectedLobbyId) || lobbies[0];
+
+  useEffect(() => {
+    if (!lobbyMenuOpen) return;
+
+    const onPointerDown = (event: MouseEvent) => {
+      if (!lobbyMenuRef.current?.contains(event.target as Node)) {
+        setLobbyMenuOpen(false);
+      }
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setLobbyMenuOpen(false);
+    };
+
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [lobbyMenuOpen]);
 
   const lobbySubmissions = submissions.filter(
     (s) => s.lobbyId === (activeLobby ? activeLobby.id : '')
@@ -534,53 +557,97 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
 
         {section === 'submissions' && (
           <div className="space-y-6 ca-fade-up">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-              <div>
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div className="min-w-0">
                 <h1 className="text-2xl font-bold font-display text-ca-ink">Live Student Submissions</h1>
-                <p className="text-xs text-ca-muted">
+                <p className="text-sm text-ca-muted mt-1">
                   CodeBERT AI predictions calibrated for live lab exam grading.
                 </p>
               </div>
+
               {lobbies.length > 0 && (
-                <label className="text-xs text-ca-muted flex flex-col gap-1">
-                  <span className="font-bold uppercase tracking-wider">Lobby</span>
-                  <select
-                    value={activeLobby?.id || ''}
-                    onChange={(e) => selectLobby(e.target.value)}
-                    className="px-3 py-2 rounded-xl bg-ca-surface border border-ca-border text-ca-ink text-xs font-semibold focus:outline-none focus:border-ca-brand cursor-pointer"
+                <div ref={lobbyMenuRef} className="relative w-full sm:w-72 shrink-0">
+                  <p className="text-[11px] font-medium text-ca-muted mb-1.5">Lobby</p>
+                  <button
+                    type="button"
+                    onClick={() => setLobbyMenuOpen((open) => !open)}
+                    aria-haspopup="listbox"
+                    aria-expanded={lobbyMenuOpen}
+                    className="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl border border-ca-border bg-ca-surface/95 backdrop-blur-md text-left text-sm text-ca-ink hover:border-ca-border-strong transition-colors cursor-pointer"
                   >
-                    {lobbies.map((lobby) => (
-                      <option key={lobby.id} value={lobby.id}>
-                        {lobby.code} — {lobby.subject}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                    <span className="min-w-0 truncate">
+                      <span className="font-mono text-[11px] font-bold text-ca-brand mr-2">
+                        {activeLobby?.code}
+                      </span>
+                      <span className="font-semibold">{activeLobby?.subject}</span>
+                    </span>
+                    <ChevronDown
+                      className={`w-4 h-4 text-ca-muted shrink-0 transition-transform ${
+                        lobbyMenuOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+
+                  {lobbyMenuOpen && (
+                    <div
+                      role="listbox"
+                      className="absolute right-0 left-0 z-30 mt-2 max-h-64 overflow-y-auto rounded-xl border border-ca-border bg-ca-surface-2 shadow-[var(--ca-shadow)] p-1.5"
+                    >
+                      {lobbies.map((lobby) => {
+                        const selected = activeLobby?.id === lobby.id;
+                        return (
+                          <button
+                            key={lobby.id}
+                            type="button"
+                            role="option"
+                            aria-selected={selected}
+                            onClick={() => {
+                              selectLobby(lobby.id);
+                              setLobbyMenuOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2.5 rounded-lg transition-colors cursor-pointer ${
+                              selected
+                                ? 'bg-ca-brand-soft text-ca-ink'
+                                : 'text-ca-ink hover:bg-ca-surface-hover'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="font-mono text-[11px] font-bold text-ca-brand shrink-0">
+                                {lobby.code}
+                              </span>
+                              <span className="text-sm font-semibold truncate">{lobby.subject}</span>
+                            </div>
+                            <p className="text-[11px] text-ca-muted mt-0.5 line-clamp-1">{lobby.title}</p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
             {activeLobby ? (
-              <div className="rounded-3xl border border-ca-border bg-ca-surface p-6 space-y-4">
+              <div className="rounded-2xl border border-ca-border bg-ca-surface/95 backdrop-blur-md p-5 sm:p-6 space-y-5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <h3 className="text-lg font-black text-ca-ink flex items-center gap-2">
-                      <FileCode className="w-5 h-5 text-ca-brand" />
-                      <span>
-                        {activeLobby.code} · {displayedSubmissions.length} files
-                      </span>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <FileCode className="w-5 h-5 text-ca-brand shrink-0" />
+                    <h3 className="text-lg font-semibold text-ca-ink truncate">
+                      {activeLobby.code}
+                      <span className="text-ca-muted font-medium"> · {displayedSubmissions.length} files</span>
                     </h3>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={handleExportCSV}
-                      className="px-3 py-2 rounded-xl bg-ca-brand-soft hover:bg-ca-brand text-ca-brand hover:text-ca-brand-ink border border-ca-border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                      className="px-3 py-2 rounded-xl bg-ca-brand-soft hover:bg-ca-brand text-ca-brand hover:text-ca-brand-ink text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                     >
                       <Download className="w-3.5 h-3.5" />
-                      <span>Export Grade CSV</span>
+                      <span>Export CSV</span>
                     </button>
                     <button
                       onClick={() => onSwitchToStudentView(activeLobby.code)}
-                      className="px-3 py-2 rounded-xl bg-ca-bg hover:bg-ca-bg-elevated text-ca-muted border border-ca-border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                      className="px-3 py-2 rounded-xl bg-ca-surface-2 hover:bg-ca-surface-hover text-ca-ink border border-ca-border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                     >
                       <Users className="w-3.5 h-3.5 text-ca-brand" />
                       <span>Test as Student</span>
@@ -588,23 +655,23 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 pt-2">
+                <div className="flex flex-wrap items-center gap-3">
                   <div className="relative flex-1 min-w-[200px]">
-                    <Search className="w-4 h-4 text-ca-faint absolute left-3 top-3" />
+                    <Search className="w-4 h-4 text-ca-faint absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search Student ID, filename, or language..."
-                      className="w-full pl-9 pr-3 py-2 rounded-xl bg-ca-bg border border-ca-border text-ca-ink placeholder:text-ca-faint text-xs focus:outline-none focus:border-ca-brand"
+                      className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-ca-surface-2 border border-ca-border text-ca-ink placeholder:text-ca-faint text-sm focus:outline-none focus:border-ca-brand"
                     />
                   </div>
-                  <div className="flex items-center gap-1 bg-ca-bg p-1 rounded-xl border border-ca-border text-xs">
+                  <div className="flex items-center gap-1 bg-ca-surface-2 p-1 rounded-xl border border-ca-border text-xs">
                     {(['All', 'High', 'Medium', 'Low'] as const).map((r) => (
                       <button
                         key={r}
                         onClick={() => setRiskFilter(r)}
-                        className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
+                        className={`px-2.5 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer ${
                           riskFilter === r ? 'bg-ca-brand text-ca-brand-ink' : 'text-ca-muted hover:text-ca-ink'
                         }`}
                       >
@@ -614,24 +681,24 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                   </div>
                 </div>
 
-                <div className="overflow-x-auto rounded-2xl border border-ca-border">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-ca-bg text-ca-muted uppercase text-[10px] font-bold tracking-wider border-b border-ca-border">
+                <div className="overflow-x-auto rounded-xl border border-ca-border">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-ca-surface-2 text-ca-muted text-[11px] font-medium tracking-wide border-b border-ca-border">
                       <tr>
                         <th className="py-3 px-4">Student ID</th>
-                        <th className="py-3 px-4">File Name</th>
+                        <th className="py-3 px-4">File name</th>
                         <th className="py-3 px-4">Language</th>
-                        <th className="py-3 px-4">AI Prediction</th>
-                        <th className="py-3 px-4">Risk Level</th>
+                        <th className="py-3 px-4">AI prediction</th>
+                        <th className="py-3 px-4">Risk</th>
                         <th className="py-3 px-4">Submitted</th>
                         <th className="py-3 px-4 text-right">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-ca-border bg-ca-bg-elevated">
+                    <tbody className="divide-y divide-ca-border bg-ca-surface-2/60">
                       {displayedSubmissions.length === 0 ? (
                         <tr>
-                          <td colSpan={7} className="py-8 text-center text-ca-faint">
-                            No student submissions found matching the criteria.
+                          <td colSpan={7} className="py-10 text-center text-ca-faint text-sm">
+                            No submissions match these filters.
                           </td>
                         </tr>
                       ) : (
@@ -640,19 +707,17 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                           const probPercent = (prob * 100).toFixed(1);
 
                           return (
-                            <tr key={sub.id} className="hover:bg-ca-surface transition-colors">
-                              <td className="py-3 px-4 font-mono font-bold text-ca-ink">{sub.studentId}</td>
-                              <td className="py-3 px-4 font-mono text-ca-muted">{sub.fileName}</td>
+                            <tr key={sub.id} className="hover:bg-ca-surface-hover/60 transition-colors">
+                              <td className="py-3 px-4 font-mono font-semibold text-ca-ink">{sub.studentId}</td>
+                              <td className="py-3 px-4 font-mono text-ca-muted text-xs">{sub.fileName}</td>
                               <td className="py-3 px-4">
-                                <span className="px-2 py-0.5 rounded bg-ca-bg-elevated text-ca-muted border border-ca-border-strong font-mono text-[10px] uppercase">
+                                <span className="px-2 py-0.5 rounded-md bg-ca-bg-elevated text-ca-muted font-mono text-[10px] uppercase">
                                   .{sub.language}
                                 </span>
                               </td>
                               <td className="py-3 px-4">
-                                <div className="space-y-1">
-                                  <div className="flex items-center justify-between text-[11px] font-mono">
-                                    <span className="font-bold text-ca-ink">{probPercent}%</span>
-                                  </div>
+                                <div className="space-y-1.5">
+                                  <span className="text-xs font-mono font-semibold text-ca-ink">{probPercent}%</span>
                                   <div className="w-24 h-1.5 rounded-full bg-ca-bg-elevated overflow-hidden">
                                     <div
                                       className={`h-full rounded-full ${
@@ -669,18 +734,18 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                               </td>
                               <td className="py-3 px-4">
                                 <span
-                                  className={`inline-block px-2.5 py-0.5 rounded-md font-bold text-[10px] uppercase tracking-wide border ${
+                                  className={`inline-block px-2 py-0.5 rounded-md font-semibold text-[10px] uppercase tracking-wide ${
                                     sub.riskLevel === 'High'
-                                      ? 'bg-ca-danger-soft text-ca-danger border-ca-border'
+                                      ? 'bg-ca-danger-soft text-ca-danger'
                                       : sub.riskLevel === 'Medium'
-                                        ? 'bg-ca-brand-soft text-ca-brand border-ca-border'
-                                        : 'bg-ca-ok-soft text-ca-ok border-ca-border'
+                                        ? 'bg-ca-brand-soft text-ca-brand'
+                                        : 'bg-ca-ok-soft text-ca-ok'
                                   }`}
                                 >
-                                  {sub.riskLevel || 'ANALYZING'}
+                                  {sub.riskLevel || 'Analyzing'}
                                 </span>
                               </td>
-                              <td className="py-3 px-4 text-ca-muted font-mono text-[11px]">
+                              <td className="py-3 px-4 text-ca-muted font-mono text-xs">
                                 {new Date(sub.submittedAt).toLocaleTimeString([], {
                                   hour: '2-digit',
                                   minute: '2-digit',
@@ -689,7 +754,7 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                               <td className="py-3 px-4 text-right">
                                 <button
                                   onClick={() => setInspectedSubmission(sub)}
-                                  className="px-2.5 py-1 rounded-lg bg-ca-surface-2 hover:bg-ca-brand hover:text-ca-brand-ink text-ca-muted border border-ca-border text-xs font-semibold flex items-center gap-1 ml-auto transition-all cursor-pointer"
+                                  className="px-2.5 py-1.5 rounded-lg bg-ca-surface hover:bg-ca-brand hover:text-ca-brand-ink text-ca-muted border border-ca-border text-xs font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer"
                                 >
                                   <Eye className="w-3.5 h-3.5" />
                                   <span>Inspect</span>
@@ -703,24 +768,20 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                   </table>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-ca-brand-soft border border-ca-border text-xs text-ca-muted flex items-center gap-2.5">
-                  <BookOpen className="w-4 h-4 text-ca-brand shrink-0" />
-                  <span>
-                    <strong>Instructor Guidance:</strong> CodeAuthentic predictions represent statistical
-                    CodeBERT token distribution deviations. Verify through code comprehension interviews
-                    before recording formal penalties.
-                  </span>
+                <div className="p-3.5 rounded-xl bg-ca-brand-soft text-sm text-ca-muted flex items-start gap-2.5">
+                  <BookOpen className="w-4 h-4 text-ca-brand shrink-0 mt-0.5" />
+                  <p>
+                    <strong className="text-ca-brand font-semibold">Instructor guidance:</strong> scores
+                    are probabilities for review support, not proof of dishonesty.
+                  </p>
                 </div>
               </div>
             ) : (
-              <div className="p-12 text-center rounded-3xl border border-ca-border bg-ca-surface text-ca-muted">
-                <h3 className="text-lg font-bold text-ca-ink mb-2">No lobby selected</h3>
-                <p className="text-xs mb-4">Create a lobby first to review student submissions.</p>
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="px-5 py-2.5 rounded-xl bg-ca-brand text-ca-brand-ink font-bold text-xs cursor-pointer"
-                >
-                  Create Exam Lobby
+              <div className="p-12 text-center rounded-2xl border border-ca-border bg-ca-surface/95 backdrop-blur-md text-ca-muted">
+                <h3 className="text-lg font-bold font-display text-ca-ink mb-2">No lobby selected</h3>
+                <p className="text-sm mb-5">Create a lobby first to review student submissions.</p>
+                <button onClick={() => setShowCreateModal(true)} className="ca-btn-primary mx-auto">
+                  Create exam lobby
                 </button>
               </div>
             )}
