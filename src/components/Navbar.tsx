@@ -1,6 +1,7 @@
 import React from 'react';
-import { Shield, Sun, Moon, LogIn, LogOut, Code, User, Terminal } from 'lucide-react';
+import { Sun, Moon, LogIn, LogOut, User, Terminal } from 'lucide-react';
 import { Instructor, Theme } from '../types';
+import csuCcisLogo from '../assets/CSU-CCIS.png';
 
 interface NavbarProps {
   currentView: 'home' | 'instructor' | 'student';
@@ -27,9 +28,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           onClick={() => setCurrentView('home')}
           className="flex items-center gap-3 cursor-pointer group"
         >
-          <div className="p-2.5 rounded-xl bg-orange-600 text-stone-950 font-black shadow-lg shadow-orange-600/30 group-hover:bg-orange-500 transition-colors">
-            <Shield className="w-5 h-5 fill-stone-950" />
-          </div>
+          <img
+            src={csuCcisLogo}
+            alt="CSU CCIS"
+            className="h-10 w-10 sm:h-11 sm:w-11 object-contain shrink-0"
+          />
           <div>
             <div className="flex items-center gap-2">
               <span className="font-extrabold tracking-tight text-lg text-white group-hover:text-orange-400 transition-colors">
