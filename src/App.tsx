@@ -21,6 +21,7 @@ import { HomeIntro } from './components/HomeIntro';
 import { InstructorLogin } from './components/InstructorLogin';
 import { InstructorDashboard } from './components/InstructorDashboard';
 import { StudentDashboard } from './components/StudentDashboard';
+import heroHall from './assets/HB.png';
 
 export default function App() {
   const [theme, setTheme] = useState<Theme>('dark');
@@ -179,9 +180,11 @@ export default function App() {
           />
         ) : currentView === 'instructor' && !instructor ? (
           <InstructorLogin onLogin={handleLogin} />
-        ) : (
-          <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 pt-24 pb-6">
-            {currentView === 'instructor' && instructor && (
+        ) : currentView === 'instructor' && instructor ? (
+          <section className="ca-hero ca-hero--app">
+            <img src={heroHall} alt="" className="ca-hero__media" aria-hidden="true" />
+            <div className="ca-hero__scrim" aria-hidden="true" />
+            <div className="ca-hero__content max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-8 w-full">
               <InstructorDashboard
                 instructor={instructor}
                 lobbies={lobbies}
@@ -193,8 +196,10 @@ export default function App() {
                 onToggleTheme={handleToggleTheme}
                 onLogout={() => setLogoutConfirmOpen(true)}
               />
-            )}
-
+            </div>
+          </section>
+        ) : (
+          <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 pt-24 pb-6">
             {currentView === 'student' && (
               <StudentDashboard
                 lobbies={lobbies}

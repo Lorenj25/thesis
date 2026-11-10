@@ -241,6 +241,21 @@ body {
   color: var(--ca-hero-text);
 }
 
+/* Post-login app shell: grow with content, keep fog readable over panels */
+.ca-hero--app {
+  align-items: flex-start;
+  overflow: visible;
+}
+
+.ca-hero--app .ca-hero__media,
+.ca-hero--app .ca-hero__scrim {
+  position: fixed;
+}
+
+.ca-hero--app .ca-hero__content {
+  max-width: 80rem;
+}
+
 .ca-hero__media {
   position: absolute;
   inset: 0;
