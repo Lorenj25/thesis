@@ -270,12 +270,15 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => setShowDatasetModal(true)}
-                  className="px-3.5 py-2.5 rounded-xl bg-ca-surface/95 hover:bg-ca-surface-hover text-ca-ink border border-ca-border text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer backdrop-blur-md"
+                  className="h-10 px-3.5 rounded-xl bg-ca-surface/95 hover:bg-ca-surface-hover text-ca-ink border border-ca-border text-xs font-semibold inline-flex items-center gap-2 transition-colors cursor-pointer backdrop-blur-md"
                 >
                   <BookOpen className="w-4 h-4 text-ca-brand" />
                   <span>Datasets</span>
                 </button>
-                <button onClick={() => setShowCreateModal(true)} className="ca-btn-primary">
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="h-10 px-3.5 rounded-xl bg-ca-brand hover:bg-ca-brand-hover text-ca-brand-ink text-xs font-semibold inline-flex items-center gap-2 transition-colors cursor-pointer"
+                >
                   <Plus className="w-4 h-4" />
                   <span>Generate New Lobby</span>
                 </button>
@@ -362,7 +365,7 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
               </div>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="ca-btn-primary self-start"
+                className="h-10 px-3.5 rounded-xl bg-ca-brand hover:bg-ca-brand-hover text-ca-brand-ink text-xs font-semibold inline-flex items-center gap-2 self-start transition-colors cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Generate New Lobby</span>

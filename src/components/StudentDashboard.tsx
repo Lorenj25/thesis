@@ -219,96 +219,94 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   };
 
   const chipClass = (active: boolean) =>
-    `text-xs px-2.5 py-1 rounded-lg font-mono font-bold transition-all border ${
+    `text-[11px] px-2.5 py-1.5 rounded-lg font-mono font-semibold transition-colors cursor-pointer ${
       active
-        ? 'bg-ca-brand text-ca-brand-ink border-ca-brand'
-        : 'bg-ca-bg-elevated text-ca-muted hover:text-ca-ink border-ca-border'
+        ? 'bg-ca-brand text-ca-brand-ink'
+        : 'bg-ca-surface-2 text-ca-muted hover:text-ca-ink border border-ca-border'
     }`;
 
   return (
-    <div className="max-w-3xl mx-auto py-4 space-y-6 ca-fade-up">
-      <div className="ca-panel p-6 sm:p-8">
-        <div className="flex items-center gap-2 text-xs font-mono font-bold text-ca-brand uppercase tracking-wider mb-2">
-          <Terminal className="w-4 h-4" />
-          <span>CCIS Student Examination Upload Portal</span>
-        </div>
+    <div className="max-w-2xl mx-auto py-2 space-y-5 ca-fade-up">
+      <div className="rounded-2xl border border-ca-border bg-ca-surface/95 backdrop-blur-md p-5 sm:p-6">
+        <p className="text-[11px] font-semibold tracking-wide text-ca-brand flex items-center gap-2 mb-2">
+          <Terminal className="w-3.5 h-3.5" />
+          <span>Student upload portal</span>
+        </p>
         <h1 className="text-2xl sm:text-3xl font-bold font-display text-ca-ink">
-          Upload Examination Source Code
+          Submit exam source code
         </h1>
-        <p className="text-xs text-ca-muted mt-1">
-          Enter your Lobby Code, your Student ID, and upload up to 3 source files (
-          <code className="text-ca-brand">.py</code>, <code className="text-ca-brand">.java</code>,{' '}
-          <code className="text-ca-brand">.c</code>).
+        <p className="text-sm text-ca-muted mt-1.5">
+          Enter lobby code and student ID, then upload up to 3 files (
+          <span className="font-mono text-ca-brand">.py</span>,{' '}
+          <span className="font-mono text-ca-brand">.java</span>,{' '}
+          <span className="font-mono text-ca-brand">.c</span>).
         </p>
       </div>
 
       {successReceipt && (
-        <div className="p-6 rounded-3xl border border-ca-border bg-ca-ok-soft text-ca-ok space-y-3 ca-fade-in">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-ca-ok-soft text-ca-ok">
-              <CheckCircle2 className="w-6 h-6" />
-            </div>
+        <div className="rounded-2xl border border-ca-border bg-ca-ok-soft p-5 sm:p-6 space-y-4 ca-fade-in">
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="w-6 h-6 text-ca-ok shrink-0 mt-0.5" />
             <div>
-              <h3 className="text-base font-extrabold text-ca-ink">Submission Successfully Received!</h3>
-              <p className="text-xs text-ca-muted">
-                Your examination source code has been transmitted to the instructor&apos;s live dashboard.
+              <h3 className="text-base font-bold text-ca-ink">Submission received</h3>
+              <p className="text-sm text-ca-muted mt-0.5">
+                Your files were sent to the instructor dashboard. AI scores stay hidden on the student side.
               </p>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-ca-surface border border-ca-border text-xs font-mono text-ca-muted grid sm:grid-cols-2 gap-2">
-            <div>
-              <span className="text-ca-faint block">Student ID:</span>
-              <strong className="text-ca-brand">{successReceipt.studentId}</strong>
+          <div className="grid sm:grid-cols-2 gap-3 text-sm">
+            <div className="rounded-xl bg-ca-surface/80 border border-ca-border p-3">
+              <p className="text-[11px] text-ca-faint">Student ID</p>
+              <p className="font-mono font-semibold text-ca-brand mt-0.5">{successReceipt.studentId}</p>
             </div>
-            <div>
-              <span className="text-ca-faint block">Exam Session:</span>
-              <span className="text-ca-ink truncate block">{successReceipt.lobbyTitle}</span>
+            <div className="rounded-xl bg-ca-surface/80 border border-ca-border p-3">
+              <p className="text-[11px] text-ca-faint">Exam</p>
+              <p className="font-semibold text-ca-ink mt-0.5 truncate">{successReceipt.lobbyTitle}</p>
             </div>
-            <div>
-              <span className="text-ca-faint block">Files Uploaded:</span>
-              <span className="text-ca-ink">{successReceipt.fileCount} file(s)</span>
+            <div className="rounded-xl bg-ca-surface/80 border border-ca-border p-3">
+              <p className="text-[11px] text-ca-faint">Files</p>
+              <p className="font-semibold text-ca-ink mt-0.5">{successReceipt.fileCount}</p>
             </div>
-            <div>
-              <span className="text-ca-faint block">Timestamp:</span>
-              <span className="text-ca-ink">{successReceipt.submittedAt}</span>
+            <div className="rounded-xl bg-ca-surface/80 border border-ca-border p-3">
+              <p className="text-[11px] text-ca-faint">Time</p>
+              <p className="font-semibold text-ca-ink mt-0.5">{successReceipt.submittedAt}</p>
             </div>
-          </div>
-
-          <div className="text-[11px] text-ca-muted flex items-center gap-1.5 pt-1">
-            <Info className="w-3.5 h-3.5 text-ca-brand shrink-0" />
-            <span>AI scores are never displayed on student portals.</span>
           </div>
 
           <button
             onClick={() => setSuccessReceipt(null)}
-            className="text-xs underline text-ca-ok font-bold hover:opacity-80 block pt-1"
+            className="text-sm font-semibold text-ca-ok hover:opacity-80 cursor-pointer"
           >
-            Submit additional file or new submission
+            Submit another file →
           </button>
         </div>
       )}
 
-      <div className="ca-panel p-6 sm:p-8 space-y-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <label className="block text-xs font-bold uppercase tracking-wider text-ca-muted">
-              1. Enter Lobby Code <span className="text-ca-brand">*</span>
+      <form
+        onSubmit={handleSubmit}
+        className="rounded-2xl border border-ca-border bg-ca-surface/95 backdrop-blur-md p-5 sm:p-6 space-y-6"
+      >
+        <section className="space-y-3">
+          <div className="flex items-baseline justify-between gap-3">
+            <label className="text-sm font-semibold text-ca-ink">
+              1. Lobby code <span className="text-ca-brand">*</span>
             </label>
-            <input
-              type="text"
-              value={lobbyCode}
-              onChange={(e) => {
-                setLobbyCode(e.target.value.toUpperCase());
-                setErrorMsg(null);
-              }}
-              placeholder="e.g. CARSU-1 or ALGO-99"
-              required
-              className="ca-input font-mono font-bold tracking-widest uppercase"
-            />
+          </div>
+          <input
+            type="text"
+            value={lobbyCode}
+            onChange={(e) => {
+              setLobbyCode(e.target.value.toUpperCase());
+              setErrorMsg(null);
+            }}
+            placeholder="e.g. CCIS-25"
+            required
+            className="ca-input font-mono font-semibold tracking-wider uppercase"
+          />
 
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <span className="text-[11px] text-ca-faint font-medium">Available Lobbies:</span>
+          {lobbies.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
               {lobbies.map((l) => (
                 <button
                   type="button"
@@ -319,197 +317,184 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   }}
                   className={chipClass(lobbyCode.toUpperCase() === l.code)}
                 >
-                  {l.code} ({l.status})
+                  {l.code}
+                  <span className="opacity-70"> · {l.status === 'ACTIVE' ? 'open' : 'locked'}</span>
                 </button>
               ))}
-            </div>
-
-            {activeLobby ? (
-              <div
-                className={`p-3 rounded-xl border text-xs flex items-center justify-between ${
-                  activeLobby.status === 'ACTIVE'
-                    ? 'bg-ca-ok-soft border-ca-border text-ca-ok'
-                    : 'bg-ca-danger-soft border-ca-border text-ca-danger'
-                }`}
-              >
-                <div>
-                  <span className="font-bold text-ca-ink">{activeLobby.subject}</span>
-                  <span className="block text-[11px] text-ca-muted">{activeLobby.title}</span>
-                </div>
-                <span className="font-mono font-black uppercase text-[10px] px-2 py-0.5 rounded bg-ca-surface text-ca-ink border border-ca-border">
-                  {activeLobby.status}
-                </span>
-              </div>
-            ) : lobbyCode.trim() ? (
-              <div className="text-xs text-ca-danger flex items-center gap-1.5">
-                <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                <span>No active exam lobby found with code &quot;{lobbyCode}&quot;.</span>
-              </div>
-            ) : null}
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-xs font-bold uppercase tracking-wider text-ca-muted">
-              2. Student ID Number <span className="text-ca-brand">*</span>
-            </label>
-            <input
-              type="text"
-              value={studentId}
-              onChange={(e) => {
-                setStudentId(e.target.value);
-                setErrorMsg(null);
-              }}
-              placeholder="e.g. 221, 222, 223, 224, 225, 226 or 221-0045"
-              required
-              className="ca-input font-mono"
-            />
-
-            <div className="flex flex-wrap items-center gap-1.5 pt-1">
-              <span className="text-[11px] text-ca-faint">Quick ID Input:</span>
-              {quickStudentIds.map((id) => (
-                <button
-                  type="button"
-                  key={id}
-                  onClick={() => setStudentId(id)}
-                  className={chipClass(studentId === id)}
-                >
-                  {id}
-                </button>
-              ))}
-            </div>
-
-            {activeLobby && studentId.trim() && (
-              <div className="p-3 rounded-xl bg-ca-bg-elevated border border-ca-border text-xs flex items-center justify-between text-ca-muted font-mono">
-                <span>Uploads quota in this lobby:</span>
-                <span className="font-bold text-ca-brand">
-                  {studentExistingCount} / 3 used ({remainingQuota} remaining)
-                </span>
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold uppercase tracking-wider text-ca-muted">
-                3. Attach Source Files (.py, .java, .c only)
-              </label>
-              <span className="text-xs font-mono text-ca-faint">
-                {stagedFiles.length} / {Math.min(3, remainingQuota)} staged (Max 3 total)
-              </span>
-            </div>
-
-            <div
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={handleDrop}
-              className="relative p-6 sm:p-8 rounded-2xl border-2 border-dashed border-ca-border hover:border-ca-brand bg-ca-bg-elevated text-center transition-all cursor-pointer group"
-              onClick={() => document.getElementById('student-file-input')?.click()}
-            >
-              <input
-                id="student-file-input"
-                type="file"
-                multiple
-                accept=".py,.java,.c"
-                className="hidden"
-                onChange={handleFileUpload}
-              />
-              <div className="w-12 h-12 rounded-2xl bg-ca-brand-soft text-ca-brand border border-ca-border flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-transform">
-                <UploadCloud className="w-6 h-6" />
-              </div>
-              <h4 className="text-sm font-bold text-ca-ink mb-1">
-                Drag and drop your code files or click to browse
-              </h4>
-              <p className="text-xs text-ca-muted max-w-sm mx-auto">
-                Only <strong className="text-ca-brand">.py</strong>,{' '}
-                <strong className="text-ca-brand">.java</strong>, and{' '}
-                <strong className="text-ca-brand">.c</strong> files accepted. Max 200 KB each (min 30
-                tokens).
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
-              <span className="text-ca-faint">Quick Test Samples:</span>
-              {(
-                [
-                  ['python_ai', '+ Python (Binary Search)'],
-                  ['python_human', '+ Python (Student Lab)'],
-                  ['c_ai', '+ C (Matrix Multiply)'],
-                  ['java_human', '+ Java (Grade Calc)'],
-                ] as const
-              ).map(([type, label]) => (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => handleLoadSample(type)}
-                  className="px-2 py-1 rounded bg-ca-bg-elevated text-ca-muted hover:text-ca-brand border border-ca-border font-mono text-[11px]"
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-
-            {stagedFiles.length > 0 && (
-              <div className="space-y-2 pt-2">
-                <div className="text-[11px] font-bold text-ca-faint uppercase">
-                  Files ready to submit ({stagedFiles.length}):
-                </div>
-                {stagedFiles.map((file, idx) => (
-                  <div
-                    key={idx}
-                    className="p-3 rounded-xl bg-ca-bg-elevated border border-ca-border flex items-center justify-between gap-3 text-xs"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <FileCode className="w-4 h-4 text-ca-brand shrink-0" />
-                      <div>
-                        <div className="font-mono font-bold text-ca-ink">{file.name}</div>
-                        <div className="text-[10px] text-ca-faint font-mono">
-                          {file.language.toUpperCase()} • {Math.round(file.size)} bytes
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeStagedFile(idx)}
-                      className="p-1 rounded-lg text-ca-faint hover:text-ca-danger transition-colors"
-                      title="Remove file"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {errorMsg && (
-            <div className="p-4 rounded-xl bg-ca-danger-soft border border-ca-border text-ca-danger text-xs flex items-start gap-2.5">
-              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-              <span>{errorMsg}</span>
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={
-              isSubmitting ||
-              stagedFiles.length === 0 ||
-              !studentId.trim() ||
-              !activeLobby ||
-              activeLobby.status === 'LOCKED' ||
-              remainingQuota === 0
-            }
-            className="ca-btn-primary w-full"
+          {activeLobby ? (
+            <div className="flex items-center justify-between gap-3 rounded-xl bg-ca-surface-2/80 border border-ca-border px-3.5 py-3">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-ca-ink truncate">{activeLobby.subject}</p>
+                <p className="text-xs text-ca-muted truncate">{activeLobby.title}</p>
+              </div>
+              <span
+                className={`shrink-0 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md ${
+                  activeLobby.status === 'ACTIVE' ? 'bg-ca-ok-soft text-ca-ok' : 'bg-ca-danger-soft text-ca-danger'
+                }`}
+              >
+                {activeLobby.status}
+              </span>
+            </div>
+          ) : lobbyCode.trim() ? (
+            <p className="text-sm text-ca-danger flex items-center gap-1.5">
+              <AlertTriangle className="w-4 h-4 shrink-0" />
+              No lobby found for “{lobbyCode}”.
+            </p>
+          ) : null}
+        </section>
+
+        <section className="space-y-3">
+          <label className="text-sm font-semibold text-ca-ink">
+            2. Student ID <span className="text-ca-brand">*</span>
+          </label>
+          <input
+            type="text"
+            value={studentId}
+            onChange={(e) => {
+              setStudentId(e.target.value);
+              setErrorMsg(null);
+            }}
+            placeholder="e.g. 221-0045"
+            required
+            className="ca-input font-mono"
+          />
+
+          <div className="flex flex-wrap gap-1.5">
+            {quickStudentIds.map((id) => (
+              <button type="button" key={id} onClick={() => setStudentId(id)} className={chipClass(studentId === id)}>
+                {id}
+              </button>
+            ))}
+          </div>
+
+          {activeLobby && studentId.trim() && (
+            <p className="text-xs text-ca-muted">
+              Quota for this lobby:{' '}
+              <span className="font-semibold text-ca-brand">
+                {studentExistingCount}/3 used · {remainingQuota} left
+              </span>
+            </p>
+          )}
+        </section>
+
+        <section className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <label className="text-sm font-semibold text-ca-ink">3. Source files</label>
+            <span className="text-xs text-ca-faint font-mono">
+              {stagedFiles.length}/{Math.min(3, Math.max(remainingQuota, stagedFiles.length))} staged
+            </span>
+          </div>
+
+          <div
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+            className="relative px-5 py-8 sm:py-10 rounded-xl border border-dashed border-ca-border hover:border-ca-brand bg-ca-surface-2/70 text-center transition-colors cursor-pointer group"
+            onClick={() => document.getElementById('student-file-input')?.click()}
           >
-            {isSubmitting ? (
-              <span>Encrypting & Transmitting Code...</span>
-            ) : (
-              <>
-                <span>Submit {stagedFiles.length} File(s) for Grading</span>
-                <ArrowRight className="w-4 h-4 stroke-[3]" />
-              </>
-            )}
-          </button>
-        </form>
-      </div>
+            <input
+              id="student-file-input"
+              type="file"
+              multiple
+              accept=".py,.java,.c"
+              className="hidden"
+              onChange={handleFileUpload}
+            />
+            <UploadCloud className="w-8 h-8 text-ca-brand mx-auto mb-3" />
+            <p className="text-sm font-semibold text-ca-ink">Drop files here or browse</p>
+            <p className="text-xs text-ca-muted mt-1">
+              .py · .java · .c · max 200 KB each
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-1.5">
+            {(
+              [
+                ['python_ai', 'Sample · Python AI'],
+                ['python_human', 'Sample · Python'],
+                ['c_ai', 'Sample · C'],
+                ['java_human', 'Sample · Java'],
+              ] as const
+            ).map(([type, label]) => (
+              <button
+                key={type}
+                type="button"
+                onClick={() => handleLoadSample(type)}
+                className="px-2.5 py-1.5 rounded-lg bg-ca-surface-2 text-ca-muted hover:text-ca-brand border border-ca-border text-[11px] font-medium cursor-pointer transition-colors"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {stagedFiles.length > 0 && (
+            <div className="space-y-2">
+              {stagedFiles.map((file, idx) => (
+                <div
+                  key={idx}
+                  className="px-3.5 py-3 rounded-xl bg-ca-surface-2/80 border border-ca-border flex items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <FileCode className="w-4 h-4 text-ca-brand shrink-0" />
+                    <div className="min-w-0">
+                      <p className="font-mono text-sm font-semibold text-ca-ink truncate">{file.name}</p>
+                      <p className="text-[11px] text-ca-faint font-mono">
+                        {file.language.toUpperCase()} · {Math.round(file.size)} B
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeStagedFile(idx)}
+                    className="p-1.5 rounded-lg text-ca-faint hover:text-ca-danger transition-colors cursor-pointer"
+                    title="Remove file"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {errorMsg && (
+          <div className="p-3.5 rounded-xl bg-ca-danger-soft text-ca-danger text-sm flex items-start gap-2.5">
+            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={
+            isSubmitting ||
+            stagedFiles.length === 0 ||
+            !studentId.trim() ||
+            !activeLobby ||
+            activeLobby.status === 'LOCKED' ||
+            remainingQuota === 0
+          }
+          className="h-11 w-full rounded-xl bg-ca-brand hover:bg-ca-brand-hover text-ca-brand-ink text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? (
+            <span>Submitting…</span>
+          ) : (
+            <>
+              <span>
+                Submit {stagedFiles.length || ''} file{stagedFiles.length === 1 ? '' : 's'}
+              </span>
+              <ArrowRight className="w-4 h-4" />
+            </>
+          )}
+        </button>
+
+        <p className="text-xs text-ca-faint flex items-center gap-1.5 justify-center">
+          <Info className="w-3.5 h-3.5 shrink-0" />
+          AI risk scores are only visible to instructors.
+        </p>
+      </form>
     </div>
   );
 };
