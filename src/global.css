@@ -1,0 +1,594 @@
+/*
+ * CodeAuthentic — global design tokens
+ * Light = :root | Dark = html.dark
+ * Use Tailwind ca-* utilities (bg-ca-bg, text-ca-ink, border-ca-border, …)
+ * instead of hardcoded stone/orange color classes.
+ */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* -------------------------------------------------------------------------- */
+/* Semantic tokens                                                            */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  /* Surfaces */
+  --ca-bg: #ece8e1;
+  --ca-bg-elevated: #e3ddd3;
+  --ca-surface: #faf8f5;
+  --ca-surface-2: #ffffff;
+  --ca-surface-hover: #f3efe8;
+
+  /* Text */
+  --ca-ink: #1a1612;
+  --ca-muted: #6b635a;
+  --ca-faint: #9a9186;
+
+  /* Borders */
+  --ca-border: #d6cfc3;
+  --ca-border-strong: #b9b0a3;
+
+  /* Brand (CSU / CodeAuthentic orange) */
+  --ca-brand: #c2410c;
+  --ca-brand-hover: #9a3412;
+  --ca-brand-soft: rgba(194, 65, 12, 0.12);
+  --ca-brand-ink: #fff7ed;
+
+  /* Status */
+  --ca-ok: #047857;
+  --ca-ok-soft: rgba(4, 120, 87, 0.12);
+  --ca-warn: #b45309;
+  --ca-warn-soft: rgba(180, 83, 9, 0.12);
+  --ca-danger: #be123c;
+  --ca-danger-soft: rgba(190, 18, 60, 0.12);
+
+  /* Overlay / chrome */
+  --ca-overlay: rgba(26, 22, 18, 0.55);
+  --ca-navbar: transparent;
+  --ca-shadow: 0 12px 40px rgba(26, 22, 18, 0.08);
+
+  /* Atmosphere */
+  --ca-wash-a: rgba(194, 65, 12, 0.1);
+  --ca-wash-b: rgba(180, 83, 9, 0.07);
+
+  /* Hero fog (light mode = soft mist) */
+  --ca-hero-fog-side: linear-gradient(
+    90deg,
+    rgba(236, 232, 225, 0.92) 0%,
+    rgba(236, 232, 225, 0.72) 42%,
+    rgba(236, 232, 225, 0.28) 72%,
+    rgba(236, 232, 225, 0.08) 100%
+  );
+  --ca-hero-fog-bottom: linear-gradient(
+    180deg,
+    rgba(236, 232, 225, 0.15) 0%,
+    rgba(236, 232, 225, 0.45) 55%,
+    rgba(236, 232, 225, 0.88) 100%
+  );
+  --ca-hero-fog-haze: radial-gradient(
+    ellipse 70% 55% at 70% 40%,
+    rgba(255, 247, 237, 0.35),
+    transparent 70%
+  );
+  --ca-hero-text: #1a1612;
+  --ca-hero-text-muted: rgba(26, 22, 18, 0.72);
+  --ca-hero-eyebrow: #c2410c;
+  --ca-hero-btn-secondary-bg: rgba(255, 255, 255, 0.55);
+  --ca-hero-btn-secondary-border: rgba(26, 22, 18, 0.14);
+  --ca-hero-btn-secondary-text: #1a1612;
+}
+
+.dark {
+  --ca-bg: #0e0c0a;
+  --ca-bg-elevated: #161310;
+  --ca-surface: #1a1612;
+  --ca-surface-2: #221e19;
+  --ca-surface-hover: #2a241e;
+
+  --ca-ink: #f5f0e8;
+  --ca-muted: #a39a8e;
+  --ca-faint: #6f675e;
+
+  --ca-border: #322c25;
+  --ca-border-strong: #4a4238;
+
+  --ca-brand: #ea580c;
+  --ca-brand-hover: #f97316;
+  --ca-brand-soft: rgba(234, 88, 12, 0.16);
+  --ca-brand-ink: #0e0c0a;
+
+  --ca-ok: #34d399;
+  --ca-ok-soft: rgba(52, 211, 153, 0.14);
+  --ca-warn: #fb923c;
+  --ca-warn-soft: rgba(251, 146, 60, 0.14);
+  --ca-danger: #fb7185;
+  --ca-danger-soft: rgba(251, 113, 133, 0.14);
+
+  --ca-overlay: rgba(0, 0, 0, 0.72);
+  --ca-navbar: transparent;
+  --ca-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+
+  --ca-wash-a: rgba(234, 88, 12, 0.16);
+  --ca-wash-b: rgba(120, 53, 15, 0.22);
+
+  /* Hero fog (dark mode = smoky veil) */
+  --ca-hero-fog-side: linear-gradient(
+    90deg,
+    rgba(14, 12, 10, 0.9) 0%,
+    rgba(14, 12, 10, 0.68) 42%,
+    rgba(14, 12, 10, 0.32) 72%,
+    rgba(14, 12, 10, 0.12) 100%
+  );
+  --ca-hero-fog-bottom: linear-gradient(
+    180deg,
+    rgba(14, 12, 10, 0.2) 0%,
+    rgba(14, 12, 10, 0.5) 55%,
+    rgba(14, 12, 10, 0.86) 100%
+  );
+  --ca-hero-fog-haze: radial-gradient(
+    ellipse 70% 55% at 70% 40%,
+    rgba(234, 88, 12, 0.12),
+    transparent 70%
+  );
+  --ca-hero-text: #f5f0e8;
+  --ca-hero-text-muted: rgba(245, 240, 232, 0.82);
+  --ca-hero-eyebrow: #fb923c;
+  --ca-hero-btn-secondary-bg: rgba(255, 255, 255, 0.08);
+  --ca-hero-btn-secondary-border: rgba(245, 240, 232, 0.28);
+  --ca-hero-btn-secondary-text: #f5f0e8;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Tailwind v4 theme bridge → utilities like bg-ca-bg, text-ca-ink            */
+/* -------------------------------------------------------------------------- */
+
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", "DM Sans", ui-sans-serif, sans-serif;
+  --font-highlight: "Unbounded", "Outfit", ui-sans-serif, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --color-ca-bg: var(--ca-bg);
+  --color-ca-bg-elevated: var(--ca-bg-elevated);
+  --color-ca-surface: var(--ca-surface);
+  --color-ca-surface-2: var(--ca-surface-2);
+  --color-ca-surface-hover: var(--ca-surface-hover);
+
+  --color-ca-ink: var(--ca-ink);
+  --color-ca-muted: var(--ca-muted);
+  --color-ca-faint: var(--ca-faint);
+
+  --color-ca-border: var(--ca-border);
+  --color-ca-border-strong: var(--ca-border-strong);
+
+  --color-ca-brand: var(--ca-brand);
+  --color-ca-brand-hover: var(--ca-brand-hover);
+  --color-ca-brand-soft: var(--ca-brand-soft);
+  --color-ca-brand-ink: var(--ca-brand-ink);
+
+  --color-ca-ok: var(--ca-ok);
+  --color-ca-ok-soft: var(--ca-ok-soft);
+  --color-ca-warn: var(--ca-warn);
+  --color-ca-warn-soft: var(--ca-warn-soft);
+  --color-ca-danger: var(--ca-danger);
+  --color-ca-danger-soft: var(--ca-danger-soft);
+
+  --color-ca-overlay: var(--ca-overlay);
+  --color-ca-navbar: var(--ca-navbar);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Base                                                                       */
+/* -------------------------------------------------------------------------- */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  background-color: var(--ca-bg);
+  color: var(--ca-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  font-stretch: normal;
+  letter-spacing: -0.02em;
+  font-synthesis: none;
+}
+
+.font-highlight {
+  font-family: var(--font-highlight);
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-synthesis: none;
+}
+
+.ca-hero-accent {
+  font-family: var(--font-highlight);
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ca-brand);
+  font-synthesis: none;
+}
+
+/* Page atmosphere (no flat single-color fill) */
+.ca-page {
+  min-height: 100vh;
+  background-color: var(--ca-bg);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 10% -10%, var(--ca-wash-a), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 95% 5%, var(--ca-wash-b), transparent 50%);
+  color: var(--ca-ink);
+}
+
+/* Instructor login/console: no page-level orange wash (landing keeps it) */
+.dark .ca-page:has(.ca-hero--login),
+.dark .ca-page:has(.ca-hero--app) {
+  background-image: none;
+}
+
+/* Full-bleed landing hero with photo background */
+.ca-hero {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  color: var(--ca-hero-text);
+}
+
+/* Post-login app shell: grow with content, keep fog readable over panels */
+/* Login + instructor app: no orange brand glow (landing keeps haze) */
+.ca-hero--login,
+.ca-hero--app {
+  --ca-hero-fog-haze: radial-gradient(
+    ellipse 70% 55% at 70% 40%,
+    rgba(236, 232, 225, 0.18),
+    transparent 70%
+  );
+}
+
+.dark .ca-hero--login,
+.dark .ca-hero--app {
+  --ca-hero-fog-haze: radial-gradient(
+    ellipse 65% 50% at 80% 70%,
+    rgba(14, 12, 10, 0.28),
+    transparent 70%
+  );
+  --ca-hero-fog-side: linear-gradient(
+    90deg,
+    rgba(14, 12, 10, 0.72) 0%,
+    rgba(14, 12, 10, 0.45) 45%,
+    rgba(14, 12, 10, 0.2) 100%
+  );
+  --ca-hero-fog-bottom: linear-gradient(
+    180deg,
+    rgba(14, 12, 10, 0.18) 0%,
+    rgba(14, 12, 10, 0.45) 55%,
+    rgba(14, 12, 10, 0.78) 100%
+  );
+}
+
+/* Slight BG lift in dark mode — keep it subtle */
+.dark .ca-hero--app .ca-hero__media,
+.dark .ca-hero--login .ca-hero__media {
+  filter: saturate(0.68) brightness(0.84);
+}
+
+.dark .ca-hero--app .ca-hero__scrim::before,
+.dark .ca-hero--login .ca-hero__scrim::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(14, 12, 10, 0.22);
+  pointer-events: none;
+}
+
+.ca-hero--app {
+  align-items: flex-start;
+  overflow: visible;
+}
+
+.ca-hero--app .ca-hero__media,
+.ca-hero--app .ca-hero__scrim {
+  position: fixed;
+}
+
+.ca-hero--app .ca-hero__content {
+  max-width: 80rem;
+  /* Clear fixed navbar so sidebar/content never sit under the brand */
+  padding-top: 6.75rem;
+  padding-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .ca-hero--app .ca-hero__content {
+    padding-top: 7.25rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+.ca-hero__media {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+}
+
+/* Theme-aware fog: soft mist in light, smoky veil in dark */
+.ca-hero__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    var(--ca-hero-fog-haze),
+    var(--ca-hero-fog-side),
+    var(--ca-hero-fog-bottom);
+  transition: background 0.35s ease, opacity 0.35s ease;
+}
+
+.ca-hero__scrim::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  filter: blur(18px);
+  opacity: 0.45;
+  transform: scale(1.05);
+}
+
+.ca-hero__content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .ca-hero__content {
+    padding: 2.5rem 1.5rem 3rem;
+  }
+}
+
+.ca-hero .ca-hero-eyebrow {
+  color: var(--ca-hero-eyebrow);
+}
+
+.ca-hero .ca-hero-title {
+  color: var(--ca-hero-text);
+}
+
+.ca-hero .ca-hero-copy {
+  color: var(--ca-hero-text-muted);
+}
+
+.ca-hero .ca-btn-secondary {
+  background: var(--ca-hero-btn-secondary-bg);
+  border-color: var(--ca-hero-btn-secondary-border);
+  color: var(--ca-hero-btn-secondary-text);
+}
+
+.ca-hero .ca-btn-secondary:hover {
+  background: var(--ca-brand-soft);
+  border-color: var(--ca-brand);
+}
+
+/* Keep form controls inside panels on their own surface tokens */
+.ca-hero .ca-panel .ca-btn-secondary {
+  background: var(--ca-surface);
+  border-color: var(--ca-border);
+  color: var(--ca-brand);
+}
+
+.ca-hero .ca-panel .ca-btn-secondary:hover {
+  background: var(--ca-brand-soft);
+  border-color: var(--ca-brand);
+}
+
+/* Shared UI primitives — theme-aware, no per-mode class forks */
+.ca-panel {
+  background: var(--ca-surface);
+  border: 1px solid var(--ca-border);
+  border-radius: 1.25rem;
+  box-shadow: var(--ca-shadow);
+}
+
+.ca-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.875rem;
+  background: var(--ca-bg-elevated);
+  border: 1px solid var(--ca-border);
+  color: var(--ca-ink);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ca-input::placeholder {
+  color: var(--ca-faint);
+}
+
+.ca-input:focus {
+  border-color: var(--ca-brand);
+  box-shadow: 0 0 0 3px var(--ca-brand-soft);
+}
+
+.ca-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  border-radius: 0.875rem;
+  background: var(--ca-brand);
+  color: var(--ca-brand-ink);
+  font-weight: 700;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.12s ease, opacity 0.12s ease;
+}
+
+.ca-btn-primary:hover:not(:disabled) {
+  background: var(--ca-brand-hover);
+}
+
+.ca-btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.ca-btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ca-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  border-radius: 0.875rem;
+  background: var(--ca-surface-2);
+  color: var(--ca-ink);
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: 1px solid var(--ca-border);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.ca-btn-secondary:hover {
+  border-color: var(--ca-brand);
+  background: var(--ca-brand-soft);
+}
+
+.ca-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.ca-scroll::-webkit-scrollbar-thumb {
+  background: var(--ca-border-strong);
+  border-radius: 999px;
+}
+
+.ca-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@keyframes ca-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ca-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ca-fade-in {
+  animation: ca-fade-in 0.25s ease-out both;
+}
+
+.ca-fade-up {
+  animation: ca-fade-up 0.4s ease-out both;
+}
+
+/* Auto-hide navbar on scroll down */
+/* Logout confirm — soft veil + glass card so dashboard stays readable */
+.ca-logout-overlay {
+  background: rgba(26, 22, 18, 0.28);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.dark .ca-logout-overlay {
+  background: rgba(0, 0, 0, 0.32);
+}
+
+.ca-logout-card {
+  background: color-mix(in srgb, var(--ca-surface) 58%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ca-border) 75%, transparent);
+  box-shadow: var(--ca-shadow);
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+}
+
+.dark .ca-logout-card {
+  background: color-mix(in srgb, var(--ca-surface-2) 48%, transparent);
+  border-color: color-mix(in srgb, white 14%, transparent);
+}
+
+.ca-navbar {
+  transform: translateY(0);
+  transition: transform 0.28s ease;
+  will-change: transform;
+}
+
+.ca-navbar.is-hidden {
+  transform: translateY(-110%);
+  pointer-events: none;
+}
+
+/* Right mini sidebar drawer */
+.ca-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: var(--ca-overlay);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  animation: ca-fade-in 0.2s ease-out both;
+}
+
+.ca-drawer {
+  position: fixed;
+  top: 0.85rem;
+  right: 0.85rem;
+  bottom: 0.85rem;
+  z-index: 50;
+  width: min(18rem, calc(100vw - 1.7rem));
+  background: transparent;
+  border: none;
+  border-radius: 1.25rem;
+  box-shadow: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  transform: translateX(calc(100% + 1.25rem));
+  transition: transform 0.28s ease;
+  pointer-events: none;
+}
+
+.ca-drawer.is-open {
+  transform: translateX(0);
+  pointer-events: auto;
+}
