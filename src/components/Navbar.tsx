@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Sun, Moon, LogOut, User, Terminal, X, Home } from 'lucide-react';
+import { Sun, Moon, LogOut, User, Terminal, X, Home, Sparkles } from 'lucide-react';
 import { Instructor, Theme } from '../types';
 import csuCcisLogo from '../assets/CSU-CCIS.png';
 
@@ -8,6 +8,7 @@ interface NavbarProps {
   setCurrentView: (view: 'home' | 'instructor' | 'student') => void;
   instructor: Instructor | null;
   onLogout: () => void;
+  onDemoLogin: () => void;
   theme: Theme;
   onToggleTheme: () => void;
 }
@@ -17,6 +18,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   setCurrentView,
   instructor,
   onLogout,
+  onDemoLogin,
   theme,
   onToggleTheme,
 }) => {
@@ -108,8 +110,18 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <div className="flex items-center gap-2.5">
             {instructor && (
-              <div className="flex items-center gap-2 px-2 py-1.5">
-                <div className="w-2 h-2 rounded-full bg-ca-ok animate-pulse" />
+              <div className="flex items-center gap-2.5 px-1 py-1">
+                <div
+                  className="w-9 h-9 rounded-full bg-ca-brand text-ca-brand-ink flex items-center justify-center text-xs font-bold shrink-0"
+                  aria-hidden="true"
+                >
+                  {instructor.name
+                    .split(/\s+/)
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .map((part) => part[0]?.toUpperCase() ?? '')
+                    .join('') || 'IN'}
+                </div>
                 <div className="text-left hidden md:block">
                   <div className="text-xs font-bold text-ca-ink leading-tight">
                     {instructor.name}
@@ -118,13 +130,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                     {instructor.idNumber}
                   </div>
                 </div>
-                <button
-                  onClick={onLogout}
-                  title="Sign out of instructor account"
-                  className="p-1 text-ca-muted hover:text-ca-danger transition-colors ml-1"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
               </div>
             )}
 
@@ -196,9 +201,23 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Terminal className="w-4 h-4" />
             <span>Student</span>
           </button>
+
+          {!instructor && (
+            <button
+              type="button"
+              onClick={() => {
+                onDemoLogin();
+                setMenuOpen(false);
+              }}
+              className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-ca-brand hover:bg-ca-brand-soft transition-colors mt-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>One-Click Demo Login</span>
+            </button>
+          )}
         </nav>
 
-        <div className="pt-4 mt-auto border-t border-ca-border">
+        <div className="pt-4 mt-auto border-t border-ca-border space-y-1">
           <button
             type="button"
             onClick={onToggleTheme}
@@ -212,6 +231,20 @@ export const Navbar: React.FC<NavbarProps> = ({
               {theme === 'dark' ? 'Dark' : 'Light'}
             </span>
           </button>
+
+          {instructor && (
+            <button
+              type="button"
+              onClick={() => {
+                onLogout();
+                setMenuOpen(false);
+              }}
+              className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-ca-danger hover:bg-ca-brand-soft transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Log out</span>
+            </button>
+          )}
         </div>
       </aside>
     </>

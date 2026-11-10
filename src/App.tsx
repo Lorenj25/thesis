@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { Instructor, Lobby, Submission, Theme } from './types';
 import {
+  DEFAULT_INSTRUCTOR,
   getStoredInstructor,
   getStoredLobbies,
   getStoredSubmissions,
@@ -142,13 +143,26 @@ export default function App() {
     setCurrentView('student');
   };
 
+  // Home is always the public landing — clear demo session so navbar/CTAs reset
+  const handleSetCurrentView = (view: 'home' | 'instructor' | 'student') => {
+    if (
+      view === 'home' &&
+      instructor?.idNumber === DEFAULT_INSTRUCTOR.idNumber
+    ) {
+      setInstructor(null);
+      saveStoredInstructor(null);
+    }
+    setCurrentView(view);
+  };
+
   return (
     <div className="ca-page flex flex-col font-sans transition-colors duration-200">
       <Navbar
         currentView={currentView}
-        setCurrentView={setCurrentView}
+        setCurrentView={handleSetCurrentView}
         instructor={instructor}
         onLogout={handleLogout}
+        onDemoLogin={() => handleLogin(DEFAULT_INSTRUCTOR)}
         theme={theme}
         onToggleTheme={handleToggleTheme}
       />
