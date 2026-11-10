@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sun, Moon, LogIn, LogOut, User, Terminal } from 'lucide-react';
+import { Sun, Moon, LogOut, User, Terminal } from 'lucide-react';
 import { Instructor, Theme } from '../types';
 import csuCcisLogo from '../assets/CSU-CCIS.png';
 
@@ -79,17 +79,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={onToggleTheme}
             aria-label="Toggle Dark/Light Mode"
             title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
-            className="p-2 rounded-xl border border-ca-border bg-ca-surface text-ca-muted hover:text-ca-brand hover:border-ca-brand transition-all cursor-pointer"
+            className="p-2 rounded-xl border border-ca-border bg-transparent text-ca-muted hover:text-ca-brand hover:border-ca-brand transition-colors cursor-pointer"
           >
             {theme === 'dark' ? (
               <Sun className="w-4 h-4 text-ca-brand" />
             ) : (
-              <Moon className="w-4 h-4 text-ca-muted" />
+              <Moon className="w-4 h-4 text-ca-ink" />
             )}
           </button>
 
-          {instructor ? (
-            <div className="flex items-center gap-2 bg-ca-surface border border-ca-border px-3 py-1.5 rounded-xl">
+          {instructor && (
+            <div className="flex items-center gap-2 px-2 py-1.5">
               <div className="w-2 h-2 rounded-full bg-ca-ok animate-pulse" />
               <div className="text-left hidden md:block">
                 <div className="text-xs font-bold text-ca-ink leading-tight">
@@ -107,14 +107,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
-          ) : (
-            <button
-              onClick={() => setCurrentView('instructor')}
-              className="px-3 py-1.5 rounded-xl bg-ca-brand-soft border border-ca-border text-ca-brand hover:bg-ca-brand hover:text-ca-brand-ink font-bold text-xs flex items-center gap-1.5 transition-all"
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>Instructor Login</span>
-            </button>
           )}
         </div>
       </div>
