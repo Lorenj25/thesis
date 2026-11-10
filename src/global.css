@@ -429,6 +429,18 @@ body {
   animation: ca-fade-up 0.4s ease-out both;
 }
 
+/* Auto-hide navbar on scroll down */
+.ca-navbar {
+  transform: translateY(0);
+  transition: transform 0.28s ease;
+  will-change: transform;
+}
+
+.ca-navbar.is-hidden {
+  transform: translateY(-110%);
+  pointer-events: none;
+}
+
 /* Right mini sidebar drawer */
 .ca-drawer-backdrop {
   position: fixed;

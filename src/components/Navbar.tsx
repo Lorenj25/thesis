@@ -21,6 +21,31 @@ export const Navbar: React.FC<NavbarProps> = ({
   onToggleTheme,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [navHidden, setNavHidden] = useState(false);
+
+  useEffect(() => {
+    let lastY = window.scrollY;
+
+    const onScroll = () => {
+      const currentY = window.scrollY;
+      const scrollingDown = currentY > lastY;
+      const pastTop = currentY > 24;
+
+      // Keep navbar visible while the menu drawer is open
+      if (menuOpen) {
+        setNavHidden(false);
+      } else if (scrollingDown && pastTop) {
+        setNavHidden(true);
+      } else {
+        setNavHidden(false);
+      }
+
+      lastY = currentY;
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [menuOpen]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -51,7 +76,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-40 border-b border-transparent bg-transparent text-ca-ink">
+      <header
+        className={`ca-navbar fixed inset-x-0 top-0 z-40 border-b border-transparent bg-transparent text-ca-ink ${
+          navHidden ? 'is-hidden' : ''
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
           <div
             onClick={() => goTo('home')}
