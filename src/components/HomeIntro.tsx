@@ -30,7 +30,7 @@ export const HomeIntro: React.FC<HomeIntroProps> = ({
 
           <h1 className="ca-hero-title font-display text-4xl sm:text-6xl lg:text-7xl font-bold leading-[1.08] max-w-4xl">
             Live AI Source Code Detection for{' '}
-            <span className="text-ca-brand">Laboratory Exams</span>
+            <span className="ca-hero-accent">Laboratory Exams</span>
           </h1>
 
           <p className="ca-hero-copy max-w-2xl text-base sm:text-lg leading-relaxed">

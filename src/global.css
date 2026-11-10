@@ -145,6 +145,7 @@
 @theme {
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", "DM Sans", ui-sans-serif, sans-serif;
+  --font-highlight: "Unbounded", "Outfit", ui-sans-serif, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   --color-ca-bg: var(--ca-bg);
@@ -198,6 +199,23 @@ body {
   font-family: var(--font-display);
   font-stretch: normal;
   letter-spacing: -0.02em;
+  font-synthesis: none;
+}
+
+.font-highlight {
+  font-family: var(--font-highlight);
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-synthesis: none;
+}
+
+.ca-hero-accent {
+  font-family: var(--font-highlight);
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ca-brand);
   font-synthesis: none;
 }
 
