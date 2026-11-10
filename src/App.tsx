@@ -21,7 +21,7 @@ import { HomeIntro } from './components/HomeIntro';
 import { InstructorLogin } from './components/InstructorLogin';
 import { InstructorDashboard } from './components/InstructorDashboard';
 import { StudentDashboard } from './components/StudentDashboard';
-import heroHall from './assets/HB.png';
+import instructorBg from './assets/BG ins.jpg';
 
 export default function App() {
   const [theme, setTheme] = useState<Theme>('dark');
@@ -185,7 +185,7 @@ export default function App() {
           <InstructorLogin onLogin={handleLogin} />
         ) : currentView === 'instructor' && instructor ? (
           <section className="ca-hero ca-hero--app">
-            <img src={heroHall} alt="" className="ca-hero__media" aria-hidden="true" />
+            <img src={instructorBg} alt="" className="ca-hero__media" aria-hidden="true" />
             <div className="ca-hero__scrim" aria-hidden="true" />
             <div className="ca-hero__content max-w-7xl mx-auto px-4 sm:px-6 w-full">
               <InstructorDashboard

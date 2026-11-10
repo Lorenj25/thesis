@@ -272,7 +272,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {logoutConfirmOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ca-overlay backdrop-blur-sm ca-fade-in"
+          className="ca-logout-overlay fixed inset-0 z-50 flex items-center justify-center p-4 ca-fade-in"
           role="dialog"
           aria-modal="true"
           aria-labelledby="logout-confirm-title"
@@ -283,7 +283,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             aria-label="Dismiss logout confirmation"
             onClick={() => setLogoutConfirmOpen(false)}
           />
-          <div className="relative w-full max-w-sm rounded-2xl bg-ca-surface-2 border border-ca-border shadow-[var(--ca-shadow)] p-6 sm:p-7 text-center ca-fade-up">
+          <div className="ca-logout-card relative w-full max-w-sm rounded-2xl p-6 sm:p-7 text-center ca-fade-up">
             <div className="mb-5 flex justify-center">
               <img
                 src={logoutLeaveArt}
