@@ -184,7 +184,7 @@ export default function App() {
                 <div className="w-16 h-16 rounded-3xl bg-ca-brand-soft text-ca-brand border border-ca-border flex items-center justify-center mx-auto text-2xl font-black">
                   !
                 </div>
-                <h2 className="text-xl font-black text-ca-ink font-display">Faculty Authentication Required</h2>
+                <h2 className="text-xl font-bold text-ca-ink font-display">Faculty Authentication Required</h2>
                 <p className="text-xs text-ca-muted">
                   Please sign in with your Instructor ID Number and Institutional Email on the homepage to access the instructor dashboard.
                 </p>

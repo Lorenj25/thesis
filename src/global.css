@@ -92,7 +92,7 @@
 
 @theme {
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Syne", "DM Sans", ui-sans-serif, sans-serif;
+  --font-display: "Outfit", "DM Sans", ui-sans-serif, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   --color-ca-bg: var(--ca-bg);
@@ -144,6 +144,9 @@ body {
 
 .font-display {
   font-family: var(--font-display);
+  font-stretch: normal;
+  letter-spacing: -0.02em;
+  font-synthesis: none;
 }
 
 /* Page atmosphere (no flat single-color fill) */

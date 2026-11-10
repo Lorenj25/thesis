@@ -243,9 +243,10 @@ label {
 .brand h1,
 .header h1,
 .brand-title {
-  font-family: Syne, "DM Sans", sans-serif;
+  font-family: Outfit, "DM Sans", sans-serif;
   font-size: 1.75rem;
-  font-weight: 800;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--ca-brand);
   letter-spacing: -0.02em;
 }

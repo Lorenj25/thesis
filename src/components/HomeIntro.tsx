@@ -55,41 +55,39 @@ export const HomeIntro: React.FC<HomeIntroProps> = ({
   };
 
   return (
-    <div className="space-y-12 py-4 ca-fade-up">
-      <section className="ca-panel relative overflow-hidden p-8 sm:p-12">
-        <div className="relative z-10 max-w-4xl space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-ca-brand-soft border border-ca-border text-ca-brand text-xs font-bold tracking-wide">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>College of Computing and Information Sciences • Caraga State University</span>
-          </div>
+    <div className="space-y-12 py-6 sm:py-10 ca-fade-up">
+      {/* Landing hero — no panel/card background; sits on page wash */}
+      <section className="relative max-w-4xl space-y-6 pt-4 sm:pt-8 pb-2">
+        <p className="text-xs sm:text-sm font-semibold text-ca-brand tracking-wide">
+          College of Computing and Information Sciences • Caraga State University
+        </p>
 
-          <h1 className="font-display text-3xl sm:text-5xl font-extrabold text-ca-ink tracking-tight leading-tight">
-            Live AI Source Code Detection for{' '}
-            <span className="text-ca-brand">Laboratory Exams</span>
-          </h1>
+        <h1 className="font-display text-3xl sm:text-5xl font-bold text-ca-ink leading-[1.15]">
+          Live AI Source Code Detection for{' '}
+          <span className="text-ca-brand">Laboratory Exams</span>
+        </h1>
 
-          <p className="max-w-3xl text-sm sm:text-base leading-relaxed text-ca-muted">
-            CodeAuthentic supports exam integrity by helping instructors identify potentially AI-generated C, Java, and Python submissions in timed laboratory exams.
-          </p>
+        <p className="max-w-2xl text-sm sm:text-base leading-relaxed text-ca-muted">
+          CodeAuthentic supports exam integrity by helping instructors identify potentially AI-generated C, Java, and Python submissions in timed laboratory exams.
+        </p>
 
-          <div className="flex flex-wrap items-center gap-3 pt-2">
-            {isInstructorLoggedIn ? (
-              <button onClick={onNavigateToInstructor} className="ca-btn-primary">
-                <span>Open Instructor Dashboard</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            ) : (
-              <a href="#instructor-login-section" className="ca-btn-primary">
-                <span>Instructor Sign In Below</span>
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            )}
-
-            <button onClick={onNavigateToStudent} className="ca-btn-secondary">
-              <Terminal className="w-4 h-4 text-ca-brand" />
-              <span>Student Submission Portal</span>
+        <div className="flex flex-wrap items-center gap-3 pt-1">
+          {isInstructorLoggedIn ? (
+            <button onClick={onNavigateToInstructor} className="ca-btn-primary">
+              <span>Open Instructor Dashboard</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
-          </div>
+          ) : (
+            <a href="#instructor-login-section" className="ca-btn-primary">
+              <span>Instructor Sign In Below</span>
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          )}
+
+          <button onClick={onNavigateToStudent} className="ca-btn-secondary">
+            <Terminal className="w-4 h-4 text-ca-brand" />
+            <span>Student Submission Portal</span>
+          </button>
         </div>
       </section>
 
@@ -98,7 +96,7 @@ export const HomeIntro: React.FC<HomeIntroProps> = ({
           <div className="ca-panel p-6 sm:p-8 space-y-6">
             <div className="flex items-center justify-between border-b border-ca-border pb-4">
               <div>
-                <h2 className="text-xl font-extrabold font-display text-ca-ink flex items-center gap-2">
+                <h2 className="text-xl font-bold font-display text-ca-ink flex items-center gap-2">
                   <KeyRound className="w-5 h-5 text-ca-brand" />
                   <span>Instructor Login</span>
                 </h2>
@@ -203,7 +201,7 @@ export const HomeIntro: React.FC<HomeIntroProps> = ({
 
         <div className="lg:col-span-7 space-y-6">
           <div className="ca-panel p-6 sm:p-8 space-y-6">
-            <h2 className="text-xl font-extrabold font-display text-ca-ink flex items-center gap-2">
+            <h2 className="text-xl font-bold font-display text-ca-ink flex items-center gap-2">
               <Layers className="w-5 h-5 text-ca-brand" />
               <span>Exam System Workflow & Security Rules</span>
             </h2>

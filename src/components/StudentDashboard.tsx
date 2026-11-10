@@ -232,7 +232,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <Terminal className="w-4 h-4" />
           <span>CCIS Student Examination Upload Portal</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold font-display text-ca-ink">
+        <h1 className="text-2xl sm:text-3xl font-bold font-display text-ca-ink">
           Upload Examination Source Code
         </h1>
         <p className="text-xs text-ca-muted mt-1">

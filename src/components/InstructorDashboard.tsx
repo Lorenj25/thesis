@@ -171,7 +171,7 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
             </span>
             <span className="text-xs text-ca-muted">ID: {instructor.idNumber}</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-ca-ink mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold font-display text-ca-ink mt-1">
             Exam Lobby Management Console
           </h1>
           <p className="text-xs text-ca-muted">
