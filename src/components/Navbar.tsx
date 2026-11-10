@@ -1,5 +1,5 @@
-import React from 'react';
-import { Sun, Moon, LogOut, User, Terminal } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Sun, Moon, LogOut, User, Terminal, Menu, X, Home } from 'lucide-react';
 import { Instructor, Theme } from '../types';
 import csuCcisLogo from '../assets/CSU-CCIS.png';
 
@@ -20,18 +20,47 @@ export const Navbar: React.FC<NavbarProps> = ({
   theme,
   onToggleTheme,
 }) => {
-  const navBtn = (active: boolean) =>
-    `px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const onPointerDown = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuOpen(false);
+    };
+
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [menuOpen]);
+
+  const goTo = (view: 'home' | 'instructor' | 'student') => {
+    setCurrentView(view);
+    setMenuOpen(false);
+  };
+
+  const menuItemClass = (active: boolean) =>
+    `w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
       active
-        ? 'bg-ca-brand text-ca-brand-ink font-bold'
-        : 'text-ca-muted hover:text-ca-ink'
+        ? 'bg-ca-brand text-ca-brand-ink'
+        : 'text-ca-ink hover:bg-ca-brand-soft hover:text-ca-brand'
     }`;
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 border-b border-transparent bg-transparent text-ca-ink">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
         <div
-          onClick={() => setCurrentView('home')}
+          onClick={() => goTo('home')}
           className="flex items-center gap-3 cursor-pointer group"
         >
           <img
@@ -53,26 +82,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             </p>
           </div>
         </div>
-
-        <nav className="flex items-center bg-ca-bg-elevated p-1 rounded-xl border border-ca-border text-xs sm:text-sm font-semibold">
-          <button onClick={() => setCurrentView('home')} className={navBtn(currentView === 'home')}>
-            Home
-          </button>
-          <button
-            onClick={() => setCurrentView('instructor')}
-            className={navBtn(currentView === 'instructor')}
-          >
-            <User className="w-3.5 h-3.5" />
-            <span>Instructor</span>
-          </button>
-          <button
-            onClick={() => setCurrentView('student')}
-            className={navBtn(currentView === 'student')}
-          >
-            <Terminal className="w-3.5 h-3.5" />
-            <span>Student</span>
-          </button>
-        </nav>
 
         <div className="flex items-center gap-2.5">
           <button
@@ -108,6 +117,47 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             </div>
           )}
+
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((open) => !open)}
+              className="p-2 rounded-xl border border-ca-brand bg-transparent text-ca-brand hover:bg-ca-brand-soft transition-colors cursor-pointer"
+            >
+              {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+
+            {menuOpen && (
+              <nav className="absolute right-0 mt-2 w-56 ca-panel p-2 shadow-lg ca-fade-in">
+                <button
+                  type="button"
+                  onClick={() => goTo('home')}
+                  className={menuItemClass(currentView === 'home')}
+                >
+                  <Home className="w-4 h-4" />
+                  <span>Home</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => goTo('instructor')}
+                  className={menuItemClass(currentView === 'instructor')}
+                >
+                  <User className="w-4 h-4" />
+                  <span>Instructor</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => goTo('student')}
+                  className={menuItemClass(currentView === 'student')}
+                >
+                  <Terminal className="w-4 h-4" />
+                  <span>Student</span>
+                </button>
+              </nav>
+            )}
+          </div>
         </div>
       </div>
     </header>
