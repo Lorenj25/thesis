@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Sun, Moon, LogOut, User, Terminal, X, Home, Sparkles } from 'lucide-react';
 import { Instructor, Theme } from '../types';
 import csuCcisLogo from '../assets/CSU-CCIS.png';
+import logoutLeaveArt from '../assets/logout-leave.png';
 
 interface NavbarProps {
   currentView: 'home' | 'instructor' | 'student';
@@ -24,6 +25,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [navHidden, setNavHidden] = useState(false);
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   useEffect(() => {
     let lastY = window.scrollY;
@@ -50,10 +52,15 @@ export const Navbar: React.FC<NavbarProps> = ({
   }, [menuOpen]);
 
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!menuOpen && !logoutConfirmOpen) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setMenuOpen(false);
+      if (event.key !== 'Escape') return;
+      if (logoutConfirmOpen) {
+        setLogoutConfirmOpen(false);
+        return;
+      }
+      setMenuOpen(false);
     };
 
     document.body.style.overflow = 'hidden';
@@ -62,7 +69,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       document.body.style.overflow = '';
       document.removeEventListener('keydown', onKeyDown);
     };
-  }, [menuOpen]);
+  }, [menuOpen, logoutConfirmOpen]);
 
   const goTo = (view: 'home' | 'instructor' | 'student') => {
     setCurrentView(view);
@@ -236,8 +243,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={() => {
-                onLogout();
                 setMenuOpen(false);
+                setLogoutConfirmOpen(true);
               }}
               className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-ca-danger hover:bg-ca-brand-soft transition-colors"
             >
@@ -247,6 +254,60 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
         </div>
       </aside>
+
+      {logoutConfirmOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ca-overlay backdrop-blur-sm ca-fade-in"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="logout-confirm-title"
+        >
+          <button
+            type="button"
+            className="absolute inset-0 cursor-default"
+            aria-label="Dismiss logout confirmation"
+            onClick={() => setLogoutConfirmOpen(false)}
+          />
+          <div className="relative w-full max-w-sm rounded-2xl bg-ca-surface-2 border border-ca-border shadow-[var(--ca-shadow)] p-6 sm:p-7 text-center ca-fade-up">
+            <div className="mb-4 flex justify-center">
+              <img
+                src={logoutLeaveArt}
+                alt=""
+                className="w-40 h-40 object-contain"
+                aria-hidden="true"
+              />
+            </div>
+            <h2
+              id="logout-confirm-title"
+              className="font-display text-xl sm:text-2xl font-bold text-ca-ink"
+            >
+              Come back soon!
+            </h2>
+            <p className="mt-2 text-sm text-ca-muted">
+              Are you sure you want to leave?
+            </p>
+            <div className="mt-6 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setLogoutConfirmOpen(false)}
+                className="px-4 py-2.5 text-sm font-semibold text-ca-danger hover:text-ca-brand-hover transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setLogoutConfirmOpen(false);
+                  onLogout();
+                }}
+                className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-ca-danger text-white hover:opacity-90 transition-opacity cursor-pointer"
+              >
+                Yes, Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
