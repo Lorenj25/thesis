@@ -153,39 +153,41 @@ export default function App() {
         onToggleTheme={handleToggleTheme}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
-        {currentView === 'home' && (
+      <main className="flex-1 w-full">
+        {currentView === 'home' ? (
           <HomeIntro
             onNavigateToStudent={() => setCurrentView('student')}
             onNavigateToInstructor={() => setCurrentView('instructor')}
             isInstructorLoggedIn={!!instructor}
           />
-        )}
+        ) : (
+          <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+            {currentView === 'instructor' && (
+              <>
+                {instructor ? (
+                  <InstructorDashboard
+                    instructor={instructor}
+                    lobbies={lobbies}
+                    submissions={submissions}
+                    onCreateLobby={handleCreateLobby}
+                    onToggleLock={handleToggleLock}
+                    onSwitchToStudentView={handleSwitchToStudentView}
+                  />
+                ) : (
+                  <InstructorLogin onLogin={handleLogin} />
+                )}
+              </>
+            )}
 
-        {currentView === 'instructor' && (
-          <>
-            {instructor ? (
-              <InstructorDashboard
-                instructor={instructor}
+            {currentView === 'student' && (
+              <StudentDashboard
                 lobbies={lobbies}
                 submissions={submissions}
-                onCreateLobby={handleCreateLobby}
-                onToggleLock={handleToggleLock}
-                onSwitchToStudentView={handleSwitchToStudentView}
+                initialLobbyCode={initialStudentLobbyCode}
+                onAddSubmissions={handleAddSubmissions}
               />
-            ) : (
-              <InstructorLogin onLogin={handleLogin} />
             )}
-          </>
-        )}
-
-        {currentView === 'student' && (
-          <StudentDashboard
-            lobbies={lobbies}
-            submissions={submissions}
-            initialLobbyCode={initialStudentLobbyCode}
-            onAddSubmissions={handleAddSubmissions}
-          />
+          </div>
         )}
       </main>
 

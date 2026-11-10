@@ -159,6 +159,73 @@ body {
   color: var(--ca-ink);
 }
 
+/* Full-bleed landing hero with photo background */
+.ca-hero {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: calc(100vh - 4.5rem);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  color: #f5f0e8;
+}
+
+.ca-hero__media {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+}
+
+.ca-hero__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(14, 12, 10, 0.88) 0%, rgba(14, 12, 10, 0.62) 48%, rgba(14, 12, 10, 0.35) 100%),
+    linear-gradient(180deg, rgba(14, 12, 10, 0.35) 0%, rgba(14, 12, 10, 0.72) 100%);
+}
+
+.ca-hero__content {
+  width: 100%;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 4.5rem 1.25rem 3.5rem;
+}
+
+@media (min-width: 640px) {
+  .ca-hero__content {
+    padding: 6rem 1.5rem 4.5rem;
+  }
+}
+
+.ca-hero .ca-hero-eyebrow {
+  color: #fb923c;
+}
+
+.ca-hero .ca-hero-title {
+  color: #f5f0e8;
+}
+
+.ca-hero .ca-hero-copy {
+  color: rgba(245, 240, 232, 0.82);
+}
+
+.ca-hero .ca-btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(245, 240, 232, 0.28);
+  color: #f5f0e8;
+}
+
+.ca-hero .ca-btn-secondary:hover {
+  background: rgba(234, 88, 12, 0.2);
+  border-color: var(--ca-brand);
+}
+
 /* Shared UI primitives — theme-aware, no per-mode class forks */
 .ca-panel {
   background: var(--ca-surface);
