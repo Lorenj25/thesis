@@ -33,7 +33,7 @@ export const InstructorLogin: React.FC<InstructorLoginProps> = ({ onLogin }) => 
   };
 
   return (
-    <section className="ca-hero">
+    <section className="ca-hero ca-hero--login">
       <img src={heroHall} alt="CSU Hiraya Hall" className="ca-hero__media" />
       <div className="ca-hero__scrim" aria-hidden="true" />
 

@@ -229,6 +229,12 @@ body {
   color: var(--ca-ink);
 }
 
+/* Instructor login/console: no page-level orange wash (landing keeps it) */
+.dark .ca-page:has(.ca-hero--login),
+.dark .ca-page:has(.ca-hero--app) {
+  background-image: none;
+}
+
 /* Full-bleed landing hero with photo background */
 .ca-hero {
   position: relative;
@@ -242,6 +248,52 @@ body {
 }
 
 /* Post-login app shell: grow with content, keep fog readable over panels */
+/* Login + instructor app: no orange brand glow (landing keeps haze) */
+.ca-hero--login,
+.ca-hero--app {
+  --ca-hero-fog-haze: radial-gradient(
+    ellipse 70% 55% at 70% 40%,
+    rgba(236, 232, 225, 0.18),
+    transparent 70%
+  );
+}
+
+.dark .ca-hero--login,
+.dark .ca-hero--app {
+  --ca-hero-fog-haze: radial-gradient(
+    ellipse 65% 50% at 80% 70%,
+    rgba(14, 12, 10, 0.35),
+    transparent 70%
+  );
+  --ca-hero-fog-side: linear-gradient(
+    90deg,
+    rgba(14, 12, 10, 0.82) 0%,
+    rgba(14, 12, 10, 0.55) 45%,
+    rgba(14, 12, 10, 0.28) 100%
+  );
+  --ca-hero-fog-bottom: linear-gradient(
+    180deg,
+    rgba(14, 12, 10, 0.25) 0%,
+    rgba(14, 12, 10, 0.55) 55%,
+    rgba(14, 12, 10, 0.88) 100%
+  );
+}
+
+/* Kill warm/orange cast from instructor BG in dark mode */
+.dark .ca-hero--app .ca-hero__media,
+.dark .ca-hero--login .ca-hero__media {
+  filter: saturate(0.55) brightness(0.78);
+}
+
+.dark .ca-hero--app .ca-hero__scrim::before,
+.dark .ca-hero--login .ca-hero__scrim::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(14, 12, 10, 0.35);
+  pointer-events: none;
+}
+
 .ca-hero--app {
   align-items: flex-start;
   overflow: visible;
