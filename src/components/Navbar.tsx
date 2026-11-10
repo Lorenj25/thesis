@@ -269,11 +269,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setLogoutConfirmOpen(false)}
           />
           <div className="relative w-full max-w-sm rounded-2xl bg-ca-surface-2 border border-ca-border shadow-[var(--ca-shadow)] p-6 sm:p-7 text-center ca-fade-up">
-            <div className="mb-4 flex justify-center">
+            <div className="mb-5 flex justify-center">
               <img
                 src={logoutLeaveArt}
                 alt=""
-                className="w-40 h-40 object-contain"
+                className="w-52 h-52 sm:w-60 sm:h-60 object-contain"
                 aria-hidden="true"
               />
             </div>
