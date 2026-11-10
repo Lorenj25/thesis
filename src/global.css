@@ -44,7 +44,7 @@
 
   /* Overlay / chrome */
   --ca-overlay: rgba(26, 22, 18, 0.55);
-  --ca-navbar: rgba(250, 248, 245, 0.92);
+  --ca-navbar: transparent;
   --ca-shadow: 0 12px 40px rgba(26, 22, 18, 0.08);
 
   /* Atmosphere */
@@ -105,7 +105,7 @@
   --ca-danger-soft: rgba(251, 113, 133, 0.14);
 
   --ca-overlay: rgba(0, 0, 0, 0.72);
-  --ca-navbar: rgba(14, 12, 10, 0.92);
+  --ca-navbar: transparent;
   --ca-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
 
   --ca-wash-a: rgba(234, 88, 12, 0.16);
