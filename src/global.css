@@ -460,12 +460,12 @@ body {
   bottom: 0.85rem;
   z-index: 50;
   width: min(18rem, calc(100vw - 1.7rem));
-  background: color-mix(in srgb, var(--ca-surface) 78%, transparent);
-  border: 1px solid var(--ca-border);
+  background: transparent;
+  border: none;
   border-radius: 1.25rem;
-  box-shadow: var(--ca-shadow);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  box-shadow: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
   padding: 1.25rem;
