@@ -29,6 +29,7 @@ export default function App() {
   const [lobbies, setLobbies] = useState<Lobby[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [initialStudentLobbyCode, setInitialStudentLobbyCode] = useState<string>('');
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   // Initialize theme, instructor session, lobbies, and submissions from localStorage
   useEffect(() => {
@@ -165,6 +166,8 @@ export default function App() {
         onDemoLogin={() => handleLogin(DEFAULT_INSTRUCTOR)}
         theme={theme}
         onToggleTheme={handleToggleTheme}
+        logoutConfirmOpen={logoutConfirmOpen}
+        setLogoutConfirmOpen={setLogoutConfirmOpen}
       />
 
       <main className="flex-1 w-full">
@@ -186,6 +189,9 @@ export default function App() {
                 onCreateLobby={handleCreateLobby}
                 onToggleLock={handleToggleLock}
                 onSwitchToStudentView={handleSwitchToStudentView}
+                theme={theme}
+                onToggleTheme={handleToggleTheme}
+                onLogout={() => setLogoutConfirmOpen(true)}
               />
             )}
 

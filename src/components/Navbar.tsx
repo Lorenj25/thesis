@@ -12,6 +12,8 @@ interface NavbarProps {
   onDemoLogin: () => void;
   theme: Theme;
   onToggleTheme: () => void;
+  logoutConfirmOpen: boolean;
+  setLogoutConfirmOpen: (open: boolean) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -22,10 +24,16 @@ export const Navbar: React.FC<NavbarProps> = ({
   onDemoLogin,
   theme,
   onToggleTheme,
+  logoutConfirmOpen,
+  setLogoutConfirmOpen,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [navHidden, setNavHidden] = useState(false);
-  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const showLandingMenu = !instructor;
+
+  useEffect(() => {
+    if (instructor) setMenuOpen(false);
+  }, [instructor]);
 
   useEffect(() => {
     let lastY = window.scrollY;
@@ -117,7 +125,12 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <div className="flex items-center gap-2.5">
             {instructor && (
-              <div className="flex items-center gap-2.5 px-1 py-1">
+              <button
+                type="button"
+                onClick={() => setCurrentView('instructor')}
+                className="flex items-center gap-2.5 px-1 py-1 bg-transparent cursor-pointer"
+                title="Open instructor console"
+              >
                 <div
                   className="w-9 h-9 rounded-full bg-ca-brand text-ca-brand-ink flex items-center justify-center text-xs font-bold shrink-0"
                   aria-hidden="true"
@@ -137,29 +150,31 @@ export const Navbar: React.FC<NavbarProps> = ({
                     {instructor.idNumber}
                   </div>
                 </div>
-              </div>
+              </button>
             )}
 
-            <button
-              type="button"
-              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={menuOpen}
-              onClick={() => setMenuOpen((open) => !open)}
-              className="inline-flex items-center gap-2.5 px-1 py-1 bg-transparent text-ca-ink hover:text-ca-brand transition-colors cursor-pointer"
-            >
-              <span className="flex flex-col justify-center gap-[5px]" aria-hidden="true">
-                <span className="block w-5 h-[2px] rounded-full bg-current" />
-                <span className="block w-5 h-[2px] rounded-full bg-current" />
-              </span>
-              <span className="text-sm font-semibold tracking-[0.14em] uppercase">
-                Menu
-              </span>
-            </button>
+            {showLandingMenu && (
+              <button
+                type="button"
+                aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={menuOpen}
+                onClick={() => setMenuOpen((open) => !open)}
+                className="inline-flex items-center gap-2.5 px-1 py-1 bg-transparent text-ca-ink hover:text-ca-brand transition-colors cursor-pointer"
+              >
+                <span className="flex flex-col justify-center gap-[5px]" aria-hidden="true">
+                  <span className="block w-5 h-[2px] rounded-full bg-current" />
+                  <span className="block w-5 h-[2px] rounded-full bg-current" />
+                </span>
+                <span className="text-sm font-semibold tracking-[0.14em] uppercase">
+                  Menu
+                </span>
+              </button>
+            )}
           </div>
         </div>
       </header>
 
-      {menuOpen && (
+      {showLandingMenu && menuOpen && (
         <button
           type="button"
           className="ca-drawer-backdrop"
@@ -169,8 +184,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       )}
 
       <aside
-        className={`ca-drawer ${menuOpen ? 'is-open' : ''}`}
-        aria-hidden={!menuOpen}
+        className={`ca-drawer ${showLandingMenu && menuOpen ? 'is-open' : ''}`}
+        aria-hidden={!showLandingMenu || !menuOpen}
       >
         <div className="flex items-center justify-between mb-6">
           <div>
