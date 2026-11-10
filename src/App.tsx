@@ -161,7 +161,7 @@ export default function App() {
             isInstructorLoggedIn={!!instructor}
           />
         ) : (
-          <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+          <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 pt-24 pb-6">
             {currentView === 'instructor' && (
               <>
                 {instructor ? (

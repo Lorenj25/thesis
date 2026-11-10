@@ -28,7 +28,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     }`;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-transparent bg-transparent text-ca-ink">
+    <header className="fixed inset-x-0 top-0 z-40 border-b border-transparent bg-transparent text-ca-ink">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
         <div
           onClick={() => setCurrentView('home')}

@@ -234,7 +234,7 @@ body {
   position: relative;
   isolation: isolate;
   width: 100%;
-  min-height: calc(100vh - 4.5rem);
+  min-height: 100vh;
   display: flex;
   align-items: center;
   overflow: hidden;
