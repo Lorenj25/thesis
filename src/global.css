@@ -312,6 +312,18 @@ body {
   border-color: var(--ca-brand);
 }
 
+/* Keep form controls inside panels on their own surface tokens */
+.ca-hero .ca-panel .ca-btn-secondary {
+  background: var(--ca-surface);
+  border-color: var(--ca-border);
+  color: var(--ca-brand);
+}
+
+.ca-hero .ca-panel .ca-btn-secondary:hover {
+  background: var(--ca-brand-soft);
+  border-color: var(--ca-brand);
+}
+
 /* Shared UI primitives — theme-aware, no per-mode class forks */
 .ca-panel {
   background: var(--ca-surface);

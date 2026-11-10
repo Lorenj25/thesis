@@ -174,23 +174,19 @@ export default function App() {
             onNavigateToInstructor={() => setCurrentView('instructor')}
             isInstructorLoggedIn={!!instructor}
           />
+        ) : currentView === 'instructor' && !instructor ? (
+          <InstructorLogin onLogin={handleLogin} />
         ) : (
           <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 pt-24 pb-6">
-            {currentView === 'instructor' && (
-              <>
-                {instructor ? (
-                  <InstructorDashboard
-                    instructor={instructor}
-                    lobbies={lobbies}
-                    submissions={submissions}
-                    onCreateLobby={handleCreateLobby}
-                    onToggleLock={handleToggleLock}
-                    onSwitchToStudentView={handleSwitchToStudentView}
-                  />
-                ) : (
-                  <InstructorLogin onLogin={handleLogin} />
-                )}
-              </>
+            {currentView === 'instructor' && instructor && (
+              <InstructorDashboard
+                instructor={instructor}
+                lobbies={lobbies}
+                submissions={submissions}
+                onCreateLobby={handleCreateLobby}
+                onToggleLock={handleToggleLock}
+                onSwitchToStudentView={handleSwitchToStudentView}
+              />
             )}
 
             {currentView === 'student' && (
@@ -204,20 +200,6 @@ export default function App() {
           </div>
         )}
       </main>
-
-      <footer className="border-t border-ca-border bg-ca-surface py-6 px-4 text-center text-xs text-ca-faint">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="font-extrabold text-ca-ink">
-              Code<span className="text-ca-brand">Authentic</span>
-            </span>
-            <span>• CCIS, Caraga State University</span>
-          </div>
-          <div className="text-[11px] text-ca-muted">
-            Frozen CodeBERT 770-dim feature extractor • C, Java, Python support • Max 3 files/student
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
