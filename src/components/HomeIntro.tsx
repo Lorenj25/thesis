@@ -28,9 +28,13 @@ export const HomeIntro: React.FC<HomeIntroProps> = ({
             College of Computing and Information Sciences • Caraga State University
           </p>
 
-          <h1 className="ca-hero-title font-display text-4xl sm:text-6xl lg:text-7xl font-bold leading-[1.08] max-w-4xl">
-            Live AI Source Code Detection for{' '}
-            <span className="ca-hero-accent">Laboratory Exams</span>
+          <h1 className="ca-hero-title font-display text-4xl sm:text-6xl lg:text-7xl font-bold leading-[1.12] max-w-5xl">
+            <span className="block">
+              Live AI <span className="ca-hero-accent">Source Code Detection</span>
+            </span>
+            <span className="block">
+              for Laboratory <span className="ca-hero-accent">Exams</span>
+            </span>
           </h1>
 
           <p className="ca-hero-copy max-w-2xl text-base sm:text-lg leading-relaxed">
