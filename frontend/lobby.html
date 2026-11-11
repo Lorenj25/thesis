@@ -142,7 +142,7 @@
         </div>
 
         <div class="form-group">
-          <label>Source Code Files (1 to 3 files: .c, .java, .py)</label>
+          <label id="file-language-label">Source Code Files</label>
           <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" style="margin: 0 auto; display: block;">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -150,8 +150,8 @@
               <line x1="12" y1="3" x2="12" y2="15"></line>
             </svg>
             <div style="font-weight: 600; margin-top: 0.5rem;">Click to browse or drop files here</div>
-            <p>Maximum 3 files, up to 200 KB each (.c, .java, .py)</p>
-            <input type="file" id="file-input" multiple accept=".c,.java,.py" style="display: none;" onchange="handleFilesSelected(this.files)">
+            <p id="file-language-help">Maximum 3 files, up to 200 KB each.</p>
+            <input type="file" id="file-input" multiple style="display: none;" onchange="handleFilesSelected(this.files)">
           </div>
 
           <ul class="file-list" id="file-list"></ul>
@@ -167,8 +167,9 @@
     const pathParts = window.location.pathname.split('/');
     const lobbyId = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
     let selectedFiles = [];
+    let activeLanguage = null;
 
-    const ALLOWED_EXTS = ['.c', '.java', '.py'];
+    const LANGUAGE_EXTENSIONS = { c: '.c', java: '.java', python: '.py' };
     const MAX_SIZE = 200 * 1024; // 200 KB
 
     async function checkLobbyStatus() {
@@ -178,6 +179,13 @@
         const data = await res.json();
 
         document.getElementById('lobby-badge').textContent = data.title;
+        activeLanguage = data.language;
+        const requiredExtension = LANGUAGE_EXTENSIONS[activeLanguage];
+        document.getElementById('file-language-label').textContent =
+          `Source Code Files (${requiredExtension} only)`;
+        document.getElementById('file-language-help').textContent =
+          `Maximum 3 files, up to 200 KB each (${requiredExtension} only).`;
+        document.getElementById('file-input').accept = requiredExtension;
 
         if (!data.active) {
           document.getElementById('upload-container').style.display = 'none';
@@ -201,12 +209,17 @@
         return;
       }
 
+      const requiredExtension = LANGUAGE_EXTENSIONS[activeLanguage];
       for (const file of newFiles) {
         const ext = '.' + file.name.split('.').pop().toLowerCase();
-        if (!ALLOWED_EXTS.includes(ext)) {
-          showError(`File '${file.name}' has an unsupported extension. Only .c, .java, and .py are allowed.`);
+        if (ext !== requiredExtension) {
+          showError(`This lobby accepts only ${requiredExtension} files. '${file.name}' was not added.`);
           return;
         }
+      }
+
+      for (const file of newFiles) {
+        const ext = '.' + file.name.split('.').pop().toLowerCase();
         if (file.size > MAX_SIZE) {
           showError(`File '${file.name}' exceeds the 200 KB size limit.`);
           return;

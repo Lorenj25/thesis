@@ -13,6 +13,7 @@ export interface Instructor {
 export interface Lobby {
   id: string;
   code: string;
+  language: Language;
   subject: string;
   title: string;
   instructorId: string;

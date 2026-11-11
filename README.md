@@ -86,7 +86,7 @@ python -m backend.test_db
 
 ### 2. Launch FastAPI Server
 ```bash
-uvicorn backend.main:app --host 0.0.0.0 --port 8000
+python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
 ```
 
 ### 3. Open Portals
@@ -94,3 +94,7 @@ uvicorn backend.main:app --host 0.0.0.0 --port 8000
 - **Instructor Dashboard**: `http://localhost:8000/dashboard`
 - **Student Upload Portal**: `http://localhost:8000/lobby/{uuid}`
 - **Interactive Swagger Docs**: `http://localhost:8000/docs`
+
+When creating a lobby, instructors choose C (`.c`), Java (`.java`), or Python (`.py`).
+The student portal accepts only that lobby's selected file extension; mismatched uploads
+are rejected before a submission record is created.

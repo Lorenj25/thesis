@@ -19,7 +19,7 @@ import {
   Shield,
   BookOpen,
 } from 'lucide-react';
-import { Instructor, Lobby, RiskLevel, Submission } from '../types';
+import { Instructor, Language, Lobby, RiskLevel, Submission } from '../types';
 import { CodeModal } from './CodeModal';
 
 interface InstructorDashboardProps {
@@ -29,6 +29,7 @@ interface InstructorDashboardProps {
   onCreateLobby: (lobbyData: {
     subject: string;
     title: string;
+    language: Language;
     durationMinutes: number;
     maxStudents: number;
   }) => Lobby;
@@ -54,6 +55,7 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
   // Form states for creating a lobby
   const [subject, setSubject] = useState('');
   const [title, setTitle] = useState('');
+  const [language, setLanguage] = useState<Language>('python');
   const [durationMinutes, setDurationMinutes] = useState(120);
   const [maxStudents, setMaxStudents] = useState(35);
 
@@ -93,6 +95,7 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
     const newLobby = onCreateLobby({
       subject: subject.trim(),
       title: title.trim(),
+      language,
       durationMinutes: Number(durationMinutes),
       maxStudents: Number(maxStudents),
     });
@@ -101,6 +104,7 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
     setShowCreateModal(false);
     setSubject('');
     setTitle('');
+    setLanguage('python');
   };
 
   const handleCopyCode = () => {
@@ -236,6 +240,9 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                           </span>
                         </div>
                         <p className="text-[11px] text-stone-400 mt-1 line-clamp-1">{lobby.title}</p>
+                        <p className="text-[10px] text-orange-400 mt-1 font-mono">
+                          Required: {lobby.language.toUpperCase()} (.{lobby.language === 'python' ? 'py' : lobby.language})
+                        </p>
                       </div>
 
                       <span
@@ -283,6 +290,9 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                       </span>
                       <span className="text-xs px-2.5 py-1 rounded-lg bg-stone-800 text-stone-300 border border-stone-700 font-mono">
                         Up to 3 Uploads / Student
+                      </span>
+                      <span className="text-xs px-2.5 py-1 rounded-lg bg-orange-500/10 text-orange-300 border border-orange-500/30 font-mono">
+                        Required: {activeLobby.language.toUpperCase()} (.{activeLobby.language === 'python' ? 'py' : activeLobby.language})
                       </span>
                     </div>
 
@@ -606,6 +616,25 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                   required
                   className="w-full px-4 py-2.5 rounded-xl bg-stone-900 border border-stone-800 text-white placeholder-stone-500 text-xs focus:outline-none focus:border-orange-500"
                 />
+              </div>
+
+              <div>
+                <label htmlFor="lobby-language" className="block text-xs font-bold uppercase tracking-wider text-stone-300 mb-1.5">
+                  Required Programming Language <span className="text-orange-500">*</span>
+                </label>
+                <select
+                  id="lobby-language"
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value as Language)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-stone-900 border border-stone-800 text-white text-xs focus:outline-none focus:border-orange-500"
+                >
+                  <option value="c">C (.c)</option>
+                  <option value="java">Java (.java)</option>
+                  <option value="python">Python (.py)</option>
+                </select>
+                <span className="text-[10px] text-stone-500 mt-1 block">
+                  Students can only submit files in this language.
+                </span>
               </div>
 
               {/* Grid: Max Students & Duration */}

@@ -79,11 +79,13 @@ export default function App() {
   const handleCreateLobby = ({
     subject,
     title,
+    language,
     durationMinutes,
     maxStudents,
   }: {
     subject: string;
     title: string;
+    language: 'c' | 'java' | 'python';
     durationMinutes: number;
     maxStudents: number;
   }): Lobby => {
@@ -97,6 +99,7 @@ export default function App() {
     const newLobby: Lobby = {
       id: `lobby-${Date.now()}`,
       code,
+      language,
       subject,
       title,
       instructorId: instructor?.idNumber || 'INS-FACULTY',

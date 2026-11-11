@@ -113,7 +113,15 @@ def check_context(code: str, language: str) -> int:
     Raises CodeTooShortError if fewer than MIN_TOKENS (30) tokens are found.
     Returns the total token count.
     """
-    tokenizer, _ = _get_tokenizer_and_model(language)
+    if language not in MODEL_IDS:
+        raise ValueError(f"Unsupported language: {language}")
+
+    if language not in _TOKENIZERS:
+        from transformers import AutoTokenizer
+
+        _TOKENIZERS[language] = AutoTokenizer.from_pretrained(MODEL_IDS[language])
+
+    tokenizer = _TOKENIZERS[language]
     tokens = tokenizer.encode(code, add_special_tokens=False)
     if len(tokens) < MIN_TOKENS:
         raise CodeTooShortError(

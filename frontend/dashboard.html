@@ -183,6 +183,12 @@
         <div class="card-title">Create Exam Lobby</div>
         <form id="create-lobby-form" onsubmit="handleCreateLobby(event)">
           <input type="text" id="lobby-title" placeholder="e.g. CS101 Midterm Lab A" required>
+          <label for="lobby-language" style="display: block; color: var(--muted); font-size: 0.8rem; margin-bottom: 0.35rem;">Required source language</label>
+          <select id="lobby-language" required>
+            <option value="c">C (.c)</option>
+            <option value="java">Java (.java)</option>
+            <option value="python" selected>Python (.py)</option>
+          </select>
           <input type="number" id="lobby-duration" min="5" max="480" value="120" placeholder="Duration (minutes)" required>
           <button type="submit" class="btn btn-primary" style="width: 100%;">Create Session</button>
         </form>
@@ -212,6 +218,7 @@
             <div style="display: flex; align-items: center; gap: 0.75rem;">
               <h2 id="active-title" style="font-size: 1.5rem; font-weight: 700;">CS101 Lab</h2>
               <span id="active-status-badge" class="badge badge-active">ACTIVE</span>
+              <span id="active-language-badge" class="badge"></span>
             </div>
             <div style="color: var(--muted); font-size: 0.85rem; margin-top: 0.25rem;">
               Expires: <span id="active-expires">--</span>

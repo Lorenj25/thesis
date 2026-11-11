@@ -6,8 +6,8 @@ Run with: python -m backend.test_db
 from __future__ import annotations
 
 import sys
-from sqlalchemy import inspect, text
-from backend.database import DATABASE_URL, engine, test_connection, create_tables
+from sqlalchemy import inspect
+from backend.database import Base, DATABASE_URL, engine, test_connection, create_tables
 from backend import models  # noqa: F401
 
 
@@ -57,19 +57,51 @@ def run_test() -> int:
     try:
         inspector = inspect(engine)
         existing_tables = inspector.get_table_names()
-        expected_tables = ["instructors", "lobbies", "submissions"]
+        expected_tables = Base.metadata.tables.keys()
 
         all_present = True
         for tbl in expected_tables:
             if tbl in existing_tables:
-                columns = [c["name"] for c in inspector.get_columns(tbl)]
+                actual_columns = {
+                    column["name"]: column["type"]
+                    for column in inspector.get_columns(tbl)
+                }
+                expected_columns = Base.metadata.tables[tbl].columns
+                columns = list(actual_columns)
                 print(f"  [OK] Table '{tbl}' found with {len(columns)} columns: {', '.join(columns)}")
+                missing_columns = set(expected_columns.keys()) - actual_columns.keys()
+                if missing_columns:
+                    print(
+                        f"  [MISMATCH] Table '{tbl}' is missing ORM columns: "
+                        f"{', '.join(sorted(missing_columns))}"
+                    )
+                    all_present = False
+
+                for column_name in set(expected_columns.keys()) & actual_columns.keys():
+                    expected_type = expected_columns[column_name].type
+                    actual_type = actual_columns[column_name]
+                    try:
+                        expected_python_type = expected_type.python_type
+                        actual_python_type = actual_type.python_type
+                    except (AttributeError, NotImplementedError):
+                        continue
+
+                    if expected_python_type != actual_python_type:
+                        print(
+                            f"  [MISMATCH] Column '{tbl}.{column_name}' has type "
+                            f"{actual_type}; ORM expects {expected_type}."
+                        )
+                        all_present = False
             else:
                 print(f"  [MISSING] Table '{tbl}' was NOT found.")
                 all_present = False
 
         if not all_present:
-            print("  FAILED: Not all expected tables exist.")
+            print(
+                "  FAILED: Database schema does not match the current ORM models. "
+                "Existing tables are not migrated by create_all(); migrate the database "
+                "before using the API."
+            )
             return 1
 
         print("  SUCCESS: All schema requirements verified.")

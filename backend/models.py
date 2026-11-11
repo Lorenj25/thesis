@@ -66,6 +66,7 @@ class Lobby(Base):
         index=True,
     )
     title = Column(String(255), nullable=False)
+    language = Column(String(20), default="python", server_default="python", nullable=False)
     status = Column(String(20), default="ACTIVE", nullable=False)  # ACTIVE | LOCKED
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     expires_at = Column(DateTime, nullable=False)

@@ -128,6 +128,7 @@ export const SEED_LOBBIES: Lobby[] = [
     instructorId: 'INS-2024-CCIS',
     instructorEmail: 'instructor@carsu.edu.ph',
     maxStudents: 35,
+    language: 'python',
     durationMinutes: 120,
     createdAt: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
     expiresAt: new Date(Date.now() + 85 * 60 * 1000).toISOString(),
@@ -142,6 +143,7 @@ export const SEED_LOBBIES: Lobby[] = [
     instructorId: 'INS-2024-CCIS',
     instructorEmail: 'instructor@carsu.edu.ph',
     maxStudents: 40,
+    language: 'python',
     durationMinutes: 90,
     createdAt: new Date(Date.now() - 100 * 60 * 1000).toISOString(),
     expiresAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
@@ -262,7 +264,11 @@ export function getStoredLobbies(): Lobby[] {
     return SEED_LOBBIES;
   }
   try {
-    const list: Lobby[] = JSON.parse(data);
+    const storedList: Lobby[] = JSON.parse(data);
+    const list = storedList.map((lobby) => ({
+      ...lobby,
+      language: lobby.language || 'python',
+    }));
     // Check auto-expiry on fetch
     const now = new Date().toISOString();
     return list.map(l => {

@@ -77,6 +77,24 @@ def submit_code(
             detail="You must upload between 1 and 3 source code files.",
         )
 
+    expected_extension = {
+        "c": ".c",
+        "java": ".java",
+        "python": ".py",
+    }[lobby.language]
+
+    for file in files:
+        filename = file.filename or "unnamed"
+        _, ext = os.path.splitext(filename.lower())
+        if ext != expected_extension:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=(
+                    f"This lobby accepts only {expected_extension} files. "
+                    f"'{filename}' cannot be submitted."
+                ),
+            )
+
     # Stage 5 check upfront: Check existing files for this student in this lobby
     existing_count = (
         db.query(Submission)

@@ -63,6 +63,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
     : 0;
 
   const remainingQuota = Math.max(0, 3 - studentExistingCount);
+  const expectedExtension = activeLobby
+    ? ({ c: '.c', java: '.java', python: '.py' } as const)[activeLobby.language]
+    : null;
 
   // Common student ID shortcuts requested in prompt (221, 222, 223, 224, 225, 226)
   const quickStudentIds = ['221', '222', '223', '224', '225', '226'];
@@ -80,6 +83,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
     }
 
     const language = EXT_TO_LANG[ext];
+
+    if (activeLobby && language !== activeLobby.language) {
+      setErrorMsg(
+        `This lobby accepts only ${activeLobby.language.toUpperCase()} (${expectedExtension}) files. '${fileName}' was not added.`
+      );
+      return;
+    }
 
     // 2. Maximum size check: 200 KB
     if (sizeBytes > 200 * 1024) {
@@ -195,6 +205,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
     if (stagedFiles.length === 0) {
       setErrorMsg('Please attach at least 1 source file (.c, .java, or .py).');
+      return;
+    }
+
+    const mismatchedFile = stagedFiles.find((file) => file.language !== activeLobby.language);
+    if (mismatchedFile) {
+      setErrorMsg(
+        `This lobby accepts only ${activeLobby.language.toUpperCase()} (${expectedExtension}) files. '${mismatchedFile.name}' cannot be submitted.`
+      );
       return;
     }
 
@@ -359,6 +377,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 <div>
                   <span className="font-bold">{activeLobby.subject}</span>
                   <span className="block text-[11px] text-stone-400">{activeLobby.title}</span>
+                  <span className="block text-[11px] text-orange-300 mt-1">
+                    Required file type: {activeLobby.language.toUpperCase()} ({expectedExtension})
+                  </span>
                 </div>
                 <span className="font-mono font-black uppercase text-[10px] px-2 py-0.5 rounded bg-stone-950">
                   {activeLobby.status}
@@ -419,11 +440,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             )}
           </div>
 
-          {/* Step 3: Source Code Upload Area (1 to 3 files: .c, .java, .py) */}
+          {/* Step 3: Source Code Upload Area */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold uppercase tracking-wider text-stone-300">
-                3. Attach Source Files (.py, .java, .c only)
+                3. Attach Source Files {expectedExtension ? `(${expectedExtension} only)` : '(.py, .java, .c)'}
               </label>
               <span className="text-xs font-mono text-stone-400">
                 {stagedFiles.length} / {Math.min(3, remainingQuota)} staged (Max 3 total)
@@ -441,7 +462,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 id="student-file-input"
                 type="file"
                 multiple
-                accept=".py,.java,.c"
+                accept={expectedExtension || '.py,.java,.c'}
                 className="hidden"
                 onChange={handleFileUpload}
               />
@@ -452,7 +473,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 Drag and drop your code files or click to browse
               </h4>
               <p className="text-xs text-stone-400 max-w-sm mx-auto">
-                Only <strong className="text-orange-400">.py</strong>, <strong className="text-orange-400">.java</strong>, and <strong className="text-orange-400">.c</strong> files accepted. Max 200 KB each (min 30 tokens).
+                {expectedExtension
+                  ? `Only ${expectedExtension} files are accepted in this lobby. `
+                  : 'Only .py, .java, and .c files are accepted. '}
+                Max 200 KB each (min 30 tokens).
               </p>
             </div>
 

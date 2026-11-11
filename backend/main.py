@@ -3,7 +3,7 @@ CodeAuthentic - FastAPI Main Application Entry Point.
 AI-Generated Source Code Detector for CCIS, Caraga State University.
 
 Runs with:
-uvicorn backend.main:app --host 0.0.0.0 --port 8000
+python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
 """
 
 from __future__ import annotations
@@ -43,15 +43,6 @@ async def lifespan(app: FastAPI):
         create_tables()
     except Exception as exc:
         print(f"[STARTUP WARNING] Database table creation deferred: {exc}")
-
-    # 3. Preload ML models if ML module exists
-    try:
-        from ml.predictor import preload_models
-        print("[STARTUP] Preloading CodeBERT language models...")
-        preload_models()
-        print("[STARTUP] CodeBERT models successfully loaded.")
-    except (ImportError, Exception) as exc:
-        print(f"[STARTUP INFO] ML models not yet loaded ({exc}). Will load when fitted.")
 
     yield
 

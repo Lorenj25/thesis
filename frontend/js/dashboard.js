@@ -51,7 +51,7 @@ async function loadLobbies() {
           <span class="badge ${lobby.status === 'ACTIVE' ? 'badge-active' : 'badge-locked'}">${lobby.status}</span>
         </div>
         <div class="lobby-item-meta">
-          Expires: ${new Date(lobby.expires_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          ${escapeHtml((lobby.language || 'python').toUpperCase())} · Expires: ${new Date(lobby.expires_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </div>
       </div>
     `).join('');
@@ -69,11 +69,12 @@ async function handleCreateLobby(e) {
   e.preventDefault();
   const title = document.getElementById('lobby-title').value.trim();
   const duration = parseInt(document.getElementById('lobby-duration').value, 10);
+  const language = document.getElementById('lobby-language').value;
 
   try {
     const res = await apiFetch('/lobbies', {
       method: 'POST',
-      body: JSON.stringify({ title, duration_minutes: duration }),
+      body: JSON.stringify({ title, duration_minutes: duration, language }),
     });
     if (!res.ok) throw new Error('Failed to create lobby');
     const newLobby = await res.json();
@@ -111,6 +112,9 @@ async function selectLobby(lobbyId) {
 function renderLobbyHeader() {
   if (!currentLobbyData) return;
   document.getElementById('active-title').textContent = currentLobbyData.title;
+  const language = currentLobbyData.language || 'python';
+  document.getElementById('active-language-badge').textContent =
+    `${language.toUpperCase()} (${getExtensionForLanguage(language)})`;
   const statusBadge = document.getElementById('active-status-badge');
   statusBadge.textContent = currentLobbyData.status;
   statusBadge.className = 'badge ' + (currentLobbyData.status === 'ACTIVE' ? 'badge-active' : 'badge-locked');
@@ -128,6 +132,10 @@ function renderLobbyHeader() {
     lockBtn.style.opacity = '1';
     lockBtn.textContent = 'Lock Session';
   }
+}
+
+function getExtensionForLanguage(language) {
+  return { c: '.c', java: '.java', python: '.py' }[language] || '';
 }
 
 function renderSubmissions() {

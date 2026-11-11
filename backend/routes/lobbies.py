@@ -41,6 +41,7 @@ def create_lobby(
         id=uuid.uuid4(),
         instructor_id=current_instructor.id,
         title=payload.title.strip(),
+        language=payload.language,
         status="ACTIVE",
         created_at=now,
         expires_at=expires_at,
@@ -53,11 +54,11 @@ def create_lobby(
     base_url = str(request.base_url).rstrip("/")
     shareable_url = f"{base_url}/lobby/{lobby.id}"
 
-    response_data = LobbyResponse.from_attributes = True
     return LobbyResponse(
         id=lobby.id,
         instructor_id=lobby.instructor_id,
         title=lobby.title,
+        language=lobby.language,
         status=lobby.status,
         created_at=lobby.created_at,
         expires_at=lobby.expires_at,
@@ -97,6 +98,7 @@ def get_instructor_lobbies(
                 id=lobby.id,
                 instructor_id=lobby.instructor_id,
                 title=lobby.title,
+                language=lobby.language,
                 status=lobby.status,
                 created_at=lobby.created_at,
                 expires_at=lobby.expires_at,
@@ -138,6 +140,7 @@ def get_lobby_detail(
         id=lobby.id,
         instructor_id=lobby.instructor_id,
         title=lobby.title,
+        language=lobby.language,
         status=lobby.status,
         created_at=lobby.created_at,
         expires_at=lobby.expires_at,
@@ -175,6 +178,7 @@ def lock_lobby(
         id=lobby.id,
         instructor_id=lobby.instructor_id,
         title=lobby.title,
+        language=lobby.language,
         status=lobby.status,
         created_at=lobby.created_at,
         expires_at=lobby.expires_at,
@@ -201,4 +205,4 @@ def get_public_lobby_status(
         db.commit()
 
     is_active = lobby.status == "ACTIVE" and datetime.utcnow() < lobby.expires_at
-    return LobbyPublicStatus(active=is_active, title=lobby.title)
+    return LobbyPublicStatus(active=is_active, title=lobby.title, language=lobby.language)

@@ -4,8 +4,9 @@ Pydantic schemas for request validation and response serialization.
 
 from __future__ import annotations
 
+import uuid
 from datetime import datetime
-from typing import Annotated, List, Optional
+from typing import Annotated, List, Literal, Optional
 from pydantic import BaseModel, Field, StringConstraints
 
 try:
@@ -81,12 +82,14 @@ class SubmissionResponse(SubmissionBase):
 class LobbyCreate(BaseModel):
     title: str = Field(..., min_length=2, max_length=200)
     duration_minutes: int = Field(..., ge=1, le=1440)  # Up to 24 hours
+    language: Literal["c", "java", "python"] = "python"
 
 
 class LobbyResponse(BaseModel):
     id: uuid.UUID
     instructor_id: int
     title: str
+    language: Literal["c", "java", "python"]
     status: str  # ACTIVE | LOCKED
     created_at: datetime
     expires_at: datetime
@@ -97,7 +100,7 @@ class LobbyResponse(BaseModel):
 
 
 class LobbyDetailResponse(LobbyResponse):
-    submissions: List[SubmissionResponse] = []
+    submissions: List[SubmissionResponse] = Field(default_factory=list)
 
     class Config:
         from_attributes = True
@@ -106,3 +109,4 @@ class LobbyDetailResponse(LobbyResponse):
 class LobbyPublicStatus(BaseModel):
     active: bool
     title: str
+    language: Literal["c", "java", "python"]
