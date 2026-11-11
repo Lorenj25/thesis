@@ -216,6 +216,20 @@ export default function App() {
           </section>
         ) : null}
       </main>
+
+      <footer className="relative z-10 border-t border-ca-border bg-ca-surface/95 backdrop-blur-md py-6 px-4 text-center text-xs text-ca-faint">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <span className="font-extrabold text-ca-ink">
+              Code<span className="text-ca-brand">Authentic</span>
+            </span>
+            <span>• CCIS, Caraga State University</span>
+          </div>
+          <div className="text-[11px] text-ca-muted">
+            Frozen CodeBERT 770-dim feature extractor • C, Java, Python • Max 3 files/student
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
