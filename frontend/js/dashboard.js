@@ -40,7 +40,7 @@ async function loadLobbies() {
     const listEl = document.getElementById('lobbies-list');
 
     if (!lobbies || lobbies.length === 0) {
-      listEl.innerHTML = '<p style="color: var(--muted); font-size: 0.85rem;">No exam lobbies found. Create one above.</p>';
+      listEl.innerHTML = '<p class="text-muted" style="font-size: 0.85rem;">No exam lobbies found. Create one above.</p>';
       return;
     }
 
@@ -159,7 +159,7 @@ function renderSubmissions() {
 
   const tbody = document.getElementById('submissions-tbody');
   if (sorted.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--muted); padding: 2rem;">No submissions yet. Awaiting student uploads.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;" class="text-muted">No submissions yet. Awaiting student uploads.</td></tr>';
     return;
   }
 
@@ -186,7 +186,7 @@ function renderSubmissions() {
         <td><strong>${probText}</strong></td>
         <td>${riskBadge}</td>
         <td>${statusBadge}</td>
-        <td style="color: var(--muted); font-size: 0.8rem;">${new Date(sub.created_at).toLocaleTimeString()}</td>
+        <td class="text-muted" style="font-size: 0.8rem;">${new Date(sub.created_at).toLocaleTimeString()}</td>
       </tr>
     `;
   }).join('');
@@ -209,7 +209,8 @@ function setupWebSocket(lobbyId) {
 
   activeWebSocket.onopen = () => {
     statusEl.textContent = 'Live Feed Connected';
-    statusEl.style.color = '#34d399';
+    statusEl.className = 'text-ok';
+    statusEl.style.fontSize = '0.75rem';
   };
 
   activeWebSocket.onmessage = (event) => {
@@ -234,7 +235,8 @@ function setupWebSocket(lobbyId) {
 
   activeWebSocket.onclose = () => {
     statusEl.textContent = 'Disconnected';
-    statusEl.style.color = '#f87171';
+    statusEl.className = 'text-danger';
+    statusEl.style.fontSize = '0.75rem';
   };
 }
 
