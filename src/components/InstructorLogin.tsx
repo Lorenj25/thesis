@@ -1,35 +1,79 @@
 import React, { useState } from 'react';
-import { AlertTriangle, KeyRound, Sparkles } from 'lucide-react';
+import { AlertTriangle, KeyRound, MailCheck } from 'lucide-react';
 import { Instructor } from '../types';
-import { DEFAULT_INSTRUCTOR } from '../utils/storage';
+import {
+  ApiRequestError,
+  loginInstructor,
+  registerInstructor,
+  resendInstructorVerification,
+} from '../utils/api';
 import heroHall from '../assets/HB.png';
 
 interface InstructorLoginProps {
-  onLogin: (instructor: Instructor) => void;
+  onLogin: (instructor: Instructor, token: string) => void;
 }
 
 export const InstructorLogin: React.FC<InstructorLoginProps> = ({ onLogin }) => {
-  const [idNumber, setIdNumber] = useState('');
+  const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [resendMessage, setResendMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!idNumber.trim()) {
-      setError('Please enter your Instructor ID Number.');
-      return;
-    }
-    if (!email.trim() || !email.includes('@')) {
-      setError('Please provide a valid institutional email address.');
-      return;
-    }
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
 
-    onLogin({
-      idNumber: idNumber.trim(),
-      email: email.trim().toLowerCase(),
-      name: name.trim() || `Instructor ${idNumber.trim()}`,
-    });
+    try {
+      if (isRegistering) {
+        await registerInstructor(name.trim(), email.trim(), password);
+        setVerificationSent(true);
+        return;
+      }
+      const token = await loginInstructor(email.trim(), password);
+      const cleanEmail = email.trim().toLowerCase();
+      onLogin({
+        idNumber: cleanEmail,
+        email: cleanEmail,
+        name: name.trim() || cleanEmail.split('@')[0],
+      }, token);
+    } catch (requestError) {
+      if (requestError instanceof ApiRequestError && requestError.status === 503) {
+        setVerificationSent(true);
+      }
+      if (requestError instanceof ApiRequestError && requestError.status === 403) {
+        setVerificationSent(true);
+      }
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : 'Unable to sign in. Please try again.',
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    setError(null);
+    setResendMessage(null);
+    setIsSubmitting(true);
+    try {
+      await resendInstructorVerification(email.trim());
+      setResendMessage('If this account needs confirmation, a verification email has been sent.');
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : 'Unable to resend the confirmation email.',
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -43,10 +87,10 @@ export const InstructorLogin: React.FC<InstructorLoginProps> = ({ onLogin }) => 
             <div className="border-b border-ca-border pb-4 space-y-1">
               <h1 className="text-xl font-bold font-display text-ca-ink flex items-center gap-2">
                 <KeyRound className="w-5 h-5 text-ca-brand" />
-                <span>Instructor Sign In</span>
+                <span>{isRegistering ? 'Create Instructor Account' : 'Instructor Sign In'}</span>
               </h1>
               <p className="text-xs text-ca-muted">
-                Faculty access for creating lobbies and reviewing AI risk scores.
+                Sign in to manage exam lobbies stored on the shared server.
               </p>
             </div>
 
@@ -57,68 +101,106 @@ export const InstructorLogin: React.FC<InstructorLoginProps> = ({ onLogin }) => 
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-ca-muted mb-1.5">
-                  Instructor ID Number <span className="text-ca-brand">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={idNumber}
-                  onChange={(e) => setIdNumber(e.target.value)}
-                  placeholder="e.g. INS-2024-CCIS or 101"
-                  required
-                  className="ca-input"
-                />
+            {verificationSent ? (
+              <div className="space-y-4">
+                <div className="p-3 rounded-xl bg-ca-brand/10 border border-ca-border text-ca-ink text-sm flex items-start gap-2">
+                  <MailCheck className="w-5 h-5 shrink-0 text-ca-brand" />
+                  <span>
+                    Check {email.trim()} for a confirmation link. You must confirm your email
+                    before signing in.
+                  </span>
+                </div>
+                {resendMessage && (
+                  <p className="text-xs text-ca-muted" role="status">{resendMessage}</p>
+                )}
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  disabled={isSubmitting || !email.trim()}
+                  className="ca-btn-primary w-full"
+                >
+                  {isSubmitting ? 'Please wait...' : 'Resend confirmation email'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setVerificationSent(false);
+                    setIsRegistering(false);
+                    setError(null);
+                    setResendMessage(null);
+                  }}
+                  className="w-full text-xs font-semibold text-ca-brand hover:underline cursor-pointer"
+                >
+                  Back to sign in
+                </button>
               </div>
-
+            ) : <form onSubmit={handleSubmit} className="space-y-4">
+              {isRegistering && (
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-ca-muted mb-1.5">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                    required
+                    minLength={2}
+                    maxLength={100}
+                    autoComplete="name"
+                    className="ca-input"
+                  />
+                </div>
+              )}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-ca-muted mb-1.5">
-                  Faculty Email <span className="text-ca-brand">*</span>
+                  Faculty Email
                 </label>
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="e.g. instructor@carsu.edu.ph"
+                  onChange={(event) => setEmail(event.target.value)}
                   required
+                  autoComplete="email"
                   className="ca-input"
                 />
               </div>
-
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-ca-muted mb-1.5">
-                  Full Name <span className="text-ca-faint font-normal">(Optional)</span>
+                  Password
                 </label>
                 <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Prof. L. Buslon"
+                  type="password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  required
+                  minLength={isRegistering ? 6 : undefined}
+                  maxLength={100}
+                  autoComplete={isRegistering ? 'new-password' : 'current-password'}
                   className="ca-input"
                 />
               </div>
-
-              <button type="submit" className="ca-btn-primary w-full">
-                Sign In to Dashboard
+              <button type="submit" disabled={isSubmitting} className="ca-btn-primary w-full">
+                {isSubmitting
+                  ? 'Please wait...'
+                  : isRegistering
+                    ? 'Create Account'
+                    : 'Sign In to Dashboard'}
               </button>
+            </form>}
 
-              <div className="relative flex items-center justify-center my-2">
-                <div className="border-t border-ca-border w-full" />
-                <span className="bg-ca-surface px-3 text-[11px] text-ca-faint uppercase font-bold absolute">
-                  or quick access
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => onLogin(DEFAULT_INSTRUCTOR)}
-                className="ca-btn-secondary w-full text-xs text-ca-brand"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>One-Click Demo Instructor Login</span>
-              </button>
-            </form>
+            {!verificationSent && <button
+              type="button"
+              onClick={() => {
+                setIsRegistering((registering) => !registering);
+                setError(null);
+              }}
+              className="w-full text-xs font-semibold text-ca-brand hover:underline cursor-pointer"
+            >
+              {isRegistering
+                ? 'Already have an account? Sign in'
+                : 'New instructor? Create an account'}
+            </button>}
           </div>
         </div>
       </div>

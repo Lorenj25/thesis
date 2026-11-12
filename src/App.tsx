@@ -3,19 +3,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Instructor, Lobby, Submission, Theme } from './types';
 import {
-  DEFAULT_INSTRUCTOR,
-  getStoredInstructor,
-  getStoredLobbies,
-  getStoredSubmissions,
-  getStoredTheme,
-  saveStoredInstructor,
-  saveStoredLobbies,
-  saveStoredSubmissions,
-  saveStoredTheme,
-} from './utils/storage';
+  clearAuthSession,
+  createLobby as createRemoteLobby,
+  deleteLobby as deleteRemoteLobby,
+  getAuthToken,
+  getSavedInstructor,
+  loadInstructorData,
+  saveAuthSession,
+  setLobbyLocked,
+} from './utils/api';
+import { getStoredTheme, saveStoredTheme } from './utils/storage';
 import { Navbar } from './components/Navbar';
 import { HomeIntro } from './components/HomeIntro';
 import { InstructorLogin } from './components/InstructorLogin';
@@ -27,24 +27,32 @@ export default function App() {
   const [theme, setTheme] = useState<Theme>('dark');
   const [currentView, setCurrentView] = useState<'home' | 'instructor' | 'student'>('home');
   const [instructor, setInstructor] = useState<Instructor | null>(null);
+  const [authToken, setAuthToken] = useState<string | null>(null);
   const [lobbies, setLobbies] = useState<Lobby[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [initialStudentLobbyCode, setInitialStudentLobbyCode] = useState<string>('');
+  const [initialStudentLobbyCode, setInitialStudentLobbyCode] = useState('');
+  const [dashboardError, setDashboardError] = useState<string | null>(null);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
-  // Initialize theme, instructor session, lobbies, and submissions from localStorage
+  const refreshDashboardData = useCallback(async () => {
+    if (!authToken) return;
+    try {
+      const data = await loadInstructorData(authToken);
+      setLobbies(data.lobbies);
+      setSubmissions(data.submissions);
+      setDashboardError(null);
+    } catch (error) {
+      setDashboardError(
+        error instanceof Error ? error.message : 'Unable to load instructor data.',
+      );
+    }
+  }, [authToken]);
+
   useEffect(() => {
     const savedTheme = getStoredTheme();
     setTheme(savedTheme);
     saveStoredTheme(savedTheme);
 
-    const savedLobbies = getStoredLobbies();
-    setLobbies(savedLobbies);
-
-    const savedSubmissions = getStoredSubmissions();
-    setSubmissions(savedSubmissions);
-
-    // Check if URL has ?lobby=CODE
     const params = new URLSearchParams(window.location.search);
     const codeParam = params.get('lobby');
     if (codeParam) {
@@ -53,113 +61,85 @@ export default function App() {
       return;
     }
 
-    // Restore instructor session into the console (not the public landing)
-    const savedInstructor = getStoredInstructor();
-    if (savedInstructor) {
+    const savedInstructor = getSavedInstructor();
+    const savedToken = getAuthToken();
+    if (savedInstructor && savedToken) {
       setInstructor(savedInstructor);
+      setAuthToken(savedToken);
       setCurrentView('instructor');
     }
   }, []);
 
-  // Theme toggle
+  useEffect(() => {
+    if (!authToken) return;
+    void refreshDashboardData();
+    const timer = window.setInterval(() => void refreshDashboardData(), 10_000);
+    return () => window.clearInterval(timer);
+  }, [authToken, refreshDashboardData]);
+
   const handleToggleTheme = () => {
     const nextTheme: Theme = theme === 'dark' ? 'light' : 'dark';
     setTheme(nextTheme);
     saveStoredTheme(nextTheme);
   };
 
-  // Instructor Login
-  const handleLogin = (newInstructor: Instructor) => {
+  const handleLogin = (newInstructor: Instructor, token: string) => {
+    saveAuthSession(newInstructor, token);
     setInstructor(newInstructor);
-    saveStoredInstructor(newInstructor);
+    setAuthToken(token);
     setCurrentView('instructor');
   };
 
-  // Instructor Logout
   const handleLogout = () => {
+    clearAuthSession();
     setInstructor(null);
-    saveStoredInstructor(null);
+    setAuthToken(null);
+    setLobbies([]);
+    setSubmissions([]);
+    setDashboardError(null);
     setCurrentView('home');
   };
 
-  // Create Lobby
-  const handleCreateLobby = ({
-    subject,
-    title,
-    language,
-    durationMinutes,
-    maxStudents,
-  }: {
+  const handleCreateLobby = async (data: {
     subject: string;
     title: string;
     language: 'c' | 'java' | 'python';
     durationMinutes: number;
     maxStudents: number;
-  }): Lobby => {
-    // Generate clean 6-character code (e.g. CCIS-12 or CARSU-3)
-    const randomSuffix = Math.floor(10 + Math.random() * 89);
-    const code = `CCIS-${randomSuffix}`;
-
-    const now = new Date();
-    const expires = new Date(now.getTime() + durationMinutes * 60 * 1000);
-
-    const newLobby: Lobby = {
-      id: `lobby-${Date.now()}`,
-      code,
-      language,
-      subject,
-      title,
-      instructorId: instructor?.idNumber || 'INS-FACULTY',
-      instructorEmail: instructor?.email || 'instructor@carsu.edu.ph',
-      maxStudents,
-      durationMinutes,
-      createdAt: now.toISOString(),
-      expiresAt: expires.toISOString(),
-      status: 'ACTIVE',
-      maxUploadsPerStudent: 3, // Fixed: 3 uploads max per student
-    };
-
-    const updated = [newLobby, ...lobbies];
-    setLobbies(updated);
-    saveStoredLobbies(updated);
-    return newLobby;
+  }): Promise<Lobby> => {
+    if (!authToken) throw new Error('Please sign in again to create a lobby.');
+    const lobby = await createRemoteLobby(
+      authToken,
+      data.subject,
+      data.title,
+      data.language,
+      data.durationMinutes,
+      data.maxStudents,
+    );
+    await refreshDashboardData();
+    return lobby;
   };
 
-  // Toggle Lobby Status (Lock / Unlock)
-  const handleToggleLock = (lobbyId: string) => {
-    const updated = lobbies.map((lobby) => {
-      if (lobby.id === lobbyId) {
-        const nextStatus = lobby.status === 'ACTIVE' ? 'LOCKED' : 'ACTIVE';
-        return { ...lobby, status: nextStatus as 'ACTIVE' | 'LOCKED' };
-      }
-      return lobby;
-    });
-    setLobbies(updated);
-    saveStoredLobbies(updated);
+  const handleToggleLock = async (lobbyId: string) => {
+    if (!authToken) throw new Error('Please sign in again to update this lobby.');
+    const lobby = lobbies.find((item) => item.id === lobbyId);
+    if (!lobby) throw new Error('This lobby is no longer available.');
+    await setLobbyLocked(authToken, lobbyId, lobby.status === 'ACTIVE');
+    await refreshDashboardData();
   };
 
-  // Add new student submissions
-  const handleAddSubmissions = (newSubmissions: Submission[]) => {
-    const updated = [...newSubmissions, ...submissions];
-    setSubmissions(updated);
-    saveStoredSubmissions(updated);
+  const handleDeleteLobby = async (lobbyId: string) => {
+    if (!authToken) throw new Error('Please sign in again to delete this lobby.');
+    await deleteRemoteLobby(authToken, lobbyId);
+    await refreshDashboardData();
   };
 
-  // Switch to Student View with prefilled lobby code
   const handleSwitchToStudentView = (lobbyCode: string) => {
     setInitialStudentLobbyCode(lobbyCode);
     setCurrentView('student');
   };
 
-  // Home is always the public landing — clear demo session so navbar/CTAs reset
   const handleSetCurrentView = (view: 'home' | 'instructor' | 'student') => {
-    if (
-      view === 'home' &&
-      instructor?.idNumber === DEFAULT_INSTRUCTOR.idNumber
-    ) {
-      setInstructor(null);
-      saveStoredInstructor(null);
-    }
     setCurrentView(view);
   };
 
@@ -170,7 +150,6 @@ export default function App() {
         setCurrentView={handleSetCurrentView}
         instructor={instructor}
         onLogout={handleLogout}
-        onDemoLogin={() => handleLogin(DEFAULT_INSTRUCTOR)}
         theme={theme}
         onToggleTheme={handleToggleTheme}
         logoutConfirmOpen={logoutConfirmOpen}
@@ -197,7 +176,10 @@ export default function App() {
                 submissions={submissions}
                 onCreateLobby={handleCreateLobby}
                 onToggleLock={handleToggleLock}
+                onDeleteLobby={handleDeleteLobby}
                 onSwitchToStudentView={handleSwitchToStudentView}
+                onRefresh={refreshDashboardData}
+                errorMessage={dashboardError}
                 theme={theme}
                 onToggleTheme={handleToggleTheme}
                 onLogout={() => setLogoutConfirmOpen(true)}
@@ -209,12 +191,7 @@ export default function App() {
             <img src={instructorBg} alt="" className="ca-hero__media" aria-hidden="true" />
             <div className="ca-hero__scrim" aria-hidden="true" />
             <div className="ca-hero__content max-w-7xl mx-auto px-4 sm:px-6 w-full">
-              <StudentDashboard
-                lobbies={lobbies}
-                submissions={submissions}
-                initialLobbyCode={initialStudentLobbyCode}
-                onAddSubmissions={handleAddSubmissions}
-              />
+              <StudentDashboard initialLobbyCode={initialStudentLobbyCode} />
             </div>
           </section>
         ) : null}

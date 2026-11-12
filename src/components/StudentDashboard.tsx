@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   UploadCloud,
   FileCode,
@@ -9,15 +9,13 @@ import {
   X,
   Info,
 } from 'lucide-react';
-import { Language, Lobby, Submission } from '../types';
-import { checkContext, EXT_TO_LANG, analyzeCode } from '../utils/aiDetector';
+import { Language, Lobby } from '../types';
+import { getPublicLobby, submitLobbyFiles } from '../utils/api';
+import { checkContext, EXT_TO_LANG } from '../utils/aiDetector';
 import { SAMPLE_CODES } from '../utils/storage';
 
 interface StudentDashboardProps {
-  lobbies: Lobby[];
-  submissions: Submission[];
   initialLobbyCode?: string;
-  onAddSubmissions: (newSubmissions: Submission[]) => void;
 }
 
 interface StagedFile {
@@ -27,13 +25,11 @@ interface StagedFile {
   size: number;
 }
 
-export const StudentDashboard: React.FC<StudentDashboardProps> = ({
-  lobbies,
-  submissions,
-  initialLobbyCode = '',
-  onAddSubmissions,
-}) => {
-  const [lobbyCode, setLobbyCode] = useState(initialLobbyCode || (lobbies[0]?.code || ''));
+export const StudentDashboard: React.FC<StudentDashboardProps> = ({ initialLobbyCode = '' }) => {
+  const [lobbyCode, setLobbyCode] = useState(initialLobbyCode);
+  const [remoteLobby, setRemoteLobby] = useState<Lobby | null>(null);
+  const [lookupPending, setLookupPending] = useState(false);
+  const [lookupError, setLookupError] = useState<string | null>(null);
   const [studentId, setStudentId] = useState('');
   const [stagedFiles, setStagedFiles] = useState<StagedFile[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,24 +41,66 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
     submittedAt: string;
   } | null>(null);
 
-  const activeLobby = lobbies.find(
-    (l) => l.code.toUpperCase().trim() === lobbyCode.toUpperCase().trim()
-  );
-
-  const studentExistingCount =
-    activeLobby && studentId.trim()
-      ? submissions.filter(
-          (s) =>
-            s.lobbyId === activeLobby.id &&
-            s.studentId.toLowerCase().trim() === studentId.toLowerCase().trim()
-        ).length
-      : 0;
-
-  const remainingQuota = Math.max(0, 3 - studentExistingCount);
+  const activeLobby = remoteLobby;
+  const remainingQuota = Math.max(0, 3 - stagedFiles.length);
   const expectedExtension = activeLobby
     ? ({ c: '.c', java: '.java', python: '.py' } as const)[activeLobby.language]
     : null;
   const quickStudentIds = ['221', '222', '223', '224', '225', '226'];
+
+  useEffect(() => {
+    if (initialLobbyCode) setLobbyCode(initialLobbyCode);
+  }, [initialLobbyCode]);
+
+  useEffect(() => {
+    const code = lobbyCode.trim();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(code)) {
+      setRemoteLobby(null);
+      setLookupPending(false);
+      setLookupError(null);
+      return;
+    }
+
+    let cancelled = false;
+    setRemoteLobby(null);
+    setLookupError(null);
+    setLookupPending(true);
+    const timer = window.setTimeout(async () => {
+      try {
+        const lobby = await getPublicLobby(code);
+        if (cancelled) return;
+        const now = new Date().toISOString();
+        setRemoteLobby({
+          id: code,
+          code,
+          language: lobby.language,
+          subject: lobby.subject || lobby.title,
+          title: lobby.subject ? lobby.title : '',
+          instructorId: '',
+          instructorEmail: '',
+          maxStudents: 35,
+          durationMinutes: 1,
+          createdAt: now,
+          expiresAt: now,
+          status: lobby.active ? 'ACTIVE' : 'LOCKED',
+          maxUploadsPerStudent: 3,
+        });
+      } catch (error) {
+        if (!cancelled) {
+          setLookupError(
+            error instanceof Error ? error.message : 'Unable to find this lobby.',
+          );
+        }
+      } finally {
+        if (!cancelled) setLookupPending(false);
+      }
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [lobbyCode]);
 
   const validateAndAddFile = (fileName: string, content: string, sizeBytes: number) => {
     setErrorMsg(null);
@@ -97,10 +135,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
       return;
     }
 
-    if (stagedFiles.length + 1 > remainingQuota) {
-      setErrorMsg(
-        `You can only submit up to 3 files total per lobby. You have already uploaded ${studentExistingCount} and can only add ${remainingQuota} more.`
-      );
+    if (stagedFiles.length >= 3) {
+      setErrorMsg('You can submit a maximum of 3 files per lobby.');
       return;
     }
 
@@ -148,7 +184,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   };
 
   const handleLoadSample = (type: 'python_ai' | 'python_human' | 'c_ai' | 'java_human') => {
-    if (stagedFiles.length >= remainingQuota) {
+    if (stagedFiles.length >= 3) {
       setErrorMsg(`Cannot add more files: maximum 3 files per student quota reached.`);
       return;
     }
@@ -164,7 +200,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
 
@@ -197,44 +233,34 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
       return;
     }
 
-    if (stagedFiles.length > remainingQuota) {
-      setErrorMsg(
-        `Upload limit exceeded! You may submit at most 3 files per exam lobby (remaining: ${remainingQuota}).`
-      );
+    if (stagedFiles.length > 3) {
+      setErrorMsg('Upload limit exceeded. You may submit at most 3 files per exam lobby.');
       return;
     }
 
     setIsSubmitting(true);
-
-    setTimeout(() => {
-      const newSubmissions: Submission[] = stagedFiles.map((f, idx) => {
-        const analysis = analyzeCode(f.code, f.name);
-        return {
-          id: `sub-${Date.now()}-${idx}`,
-          lobbyId: activeLobby.id,
-          studentId: cleanId,
-          fileName: f.name,
-          language: f.language,
-          sourceCode: f.code,
-          status: 'done',
-          aiProbability: analysis.aiProbability,
-          riskLevel: analysis.riskLevel,
-          tokenCount: analysis.tokenCount,
-          indicators: analysis.indicators,
-          submittedAt: new Date().toISOString(),
-        };
-      });
-
-      onAddSubmissions(newSubmissions);
-      setIsSubmitting(false);
+    try {
+      await submitLobbyFiles(
+        activeLobby.id,
+        cleanId,
+        stagedFiles.map(({ name, code }) => ({ name, content: code })),
+      );
       setSuccessReceipt({
         studentId: cleanId,
-        lobbyTitle: `${activeLobby.subject} (${activeLobby.title})`,
+        lobbyTitle: activeLobby.title
+          ? `${activeLobby.subject} (${activeLobby.title})`
+          : activeLobby.subject,
         fileCount: stagedFiles.length,
         submittedAt: new Date().toLocaleTimeString(),
       });
       setStagedFiles([]);
-    }, 600);
+    } catch (error) {
+      setErrorMsg(
+        error instanceof Error ? error.message : 'Unable to submit your files.',
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const chipClass = (active: boolean) =>
@@ -318,31 +344,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     value={lobbyCode}
                     onChange={(e) => {
                       setLobbyCode(e.target.value.toUpperCase());
+                      setStagedFiles([]);
                       setErrorMsg(null);
                     }}
-                    placeholder="e.g. CCIS-25"
+                    placeholder="Paste the shared lobby code"
                     required
                     className="ca-input font-mono font-semibold tracking-wider uppercase"
                   />
-
-                  {lobbies.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {lobbies.map((l) => (
-                        <button
-                          type="button"
-                          key={l.id}
-                          onClick={() => {
-                            setLobbyCode(l.code);
-                            setErrorMsg(null);
-                          }}
-                          className={chipClass(lobbyCode.toUpperCase() === l.code)}
-                        >
-                          {l.code}
-                          <span className="opacity-70"> · {l.status === 'ACTIVE' ? 'open' : 'locked'}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
 
                   {activeLobby ? (
                     <div className="flex items-center justify-between gap-3 rounded-xl bg-ca-surface-2/80 border border-ca-border px-3.5 py-3">
@@ -361,9 +369,13 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                       </span>
                     </div>
                   ) : lobbyCode.trim() ? (
-                    <p className="text-sm text-ca-danger flex items-center gap-1.5">
-                      <AlertTriangle className="w-4 h-4 shrink-0" />
-                      No lobby found for “{lobbyCode}”.
+                    <p className={`text-sm flex items-center gap-1.5 ${lookupError ? 'text-ca-danger' : 'text-ca-muted'}`}>
+                      {lookupError && <AlertTriangle className="w-4 h-4 shrink-0" />}
+                      {lookupPending
+                        ? 'Checking shared lobby...'
+                        : lookupError
+                          ? `No lobby found: ${lookupError}`
+                          : 'Paste the complete lobby code copied by your instructor.'}
                     </p>
                   ) : null}
                 </section>
@@ -407,14 +419,6 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     </li>
                     <li>AI risk scores stay instructor-only</li>
                   </ul>
-                  {activeLobby && studentId.trim() && (
-                    <p className="text-xs pt-1 border-t border-ca-border mt-2">
-                      <span className="text-ca-faint">Quota · </span>
-                      <span className="font-semibold text-ca-brand">
-                        {studentExistingCount}/3 used · {remainingQuota} left
-                      </span>
-                    </p>
-                  )}
                 </div>
               </div>
 
@@ -424,7 +428,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                     3. Source files {expectedExtension ? `(${expectedExtension} only)` : ''}
                   </label>
                   <span className="text-xs text-ca-faint font-mono">
-                    {stagedFiles.length}/{Math.min(3, Math.max(remainingQuota, stagedFiles.length))} staged
+                    {stagedFiles.length}/3 staged
                   </span>
                 </div>
 

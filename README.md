@@ -79,6 +79,23 @@ python -m ml.demo --file path/to/student_code.py
 
 ## Running the Web System
 
+### Instructor email confirmation
+New instructor accounts must confirm their email address before signing in. Copy
+the SMTP settings from [.env.example](./.env.example) into your local `.env` file
+and replace the example values with credentials from your mail provider. Do not
+commit `.env`. Set `API_PUBLIC_URL` to the public backend origin so confirmation
+links can reach the API. If delivery fails, the account remains unverified and
+the sign-in page offers a resend action after the SMTP settings are corrected.
+
+If the connected PostgreSQL database has the older incompatible instructor/lobby
+schema, back it up and explicitly set `ALLOW_LEGACY_SCHEMA_MIGRATION=true`
+before starting the backend. The migration renames the old tables with a
+`_legacy_<timestamp>` suffix and copies existing instructor accounts into the
+current schema. The original password hashes are preserved and existing
+accounts remain verified. The archived tables are retained; they are not
+dropped. Without explicit approval, startup reports the schema mismatch and
+does not modify the database.
+
 ### 1. Verify Database
 ```bash
 python -m backend.test_db
@@ -98,3 +115,19 @@ python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
 When creating a lobby, instructors choose C (`.c`), Java (`.java`), or Python (`.py`).
 The student portal accepts only that lobby's selected file extension; mismatched uploads
 are rejected before a submission record is created.
+
+### React dashboard and shareable lobbies
+The React dashboard also uses the FastAPI database for instructor accounts, lobbies, and
+student uploads. Run the backend above, then start the React app in a second terminal:
+```bash
+npm run dev
+```
+The Vite development server proxies API and lobby requests to `http://127.0.0.1:8000`.
+In deployments where the API is hosted separately, set `VITE_API_BASE_URL` to the backend
+origin when building the React app. If the server's public address differs from the request
+host (for example, localhost or a reverse proxy), set `PUBLIC_BASE_URL` in the backend
+environment to the public backend origin that serves `/lobby/{uuid}`. Instructors must
+sign in with a registered account; generated lobby UUIDs and links resolve through the
+backend, so sharing works across browsers and devices connected to that deployment.
+For local network sharing, open the dashboard using the host machine's LAN address rather
+than `localhost`, or configure `PUBLIC_BASE_URL` to that address.

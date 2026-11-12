@@ -255,9 +255,36 @@ async function lockCurrentLobby() {
   }
 }
 
+async function deleteCurrentLobby() {
+  if (!currentLobbyId) return;
+  const title = currentLobbyData?.title || 'this lobby';
+  if (!confirm(`Delete "${title}" and all of its student submissions? This cannot be undone.`)) return;
+
+  try {
+    const res = await apiFetch(`/lobbies/${currentLobbyId}`, { method: 'DELETE' });
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}));
+      throw new Error(error.detail || 'Failed to delete lobby');
+    }
+
+    if (activeWebSocket) {
+      activeWebSocket.close();
+      activeWebSocket = null;
+    }
+    currentLobbyId = null;
+    currentLobbyData = null;
+    currentSubmissions = [];
+    document.getElementById('active-lobby-container').style.display = 'none';
+    document.getElementById('no-lobby-selected').style.display = 'block';
+    await loadLobbies();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
 function copyLobbyLink() {
   if (!currentLobbyId) return;
-  const url = `${window.location.origin}/lobby/${currentLobbyId}`;
+  const url = currentLobbyData?.shareable_url || `${window.location.origin}/lobby/${currentLobbyId}`;
   navigator.clipboard.writeText(url).then(() => {
     alert('Student submission link copied to clipboard:\n' + url);
   }).catch(() => {

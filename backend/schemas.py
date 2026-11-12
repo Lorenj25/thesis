@@ -34,6 +34,14 @@ class InstructorLogin(BaseModel):
     password: str
 
 
+class VerificationRequest(BaseModel):
+    email: EmailStr
+
+
+class VerificationMessage(BaseModel):
+    message: str
+
+
 class InstructorResponse(InstructorBase):
     id: int
     created_at: datetime
@@ -80,16 +88,20 @@ class SubmissionResponse(SubmissionBase):
 # ==============================================================================
 
 class LobbyCreate(BaseModel):
+    subject: str = Field(default="", max_length=255)
     title: str = Field(..., min_length=2, max_length=200)
     duration_minutes: int = Field(..., ge=1, le=1440)  # Up to 24 hours
     language: Literal["c", "java", "python"] = "python"
+    max_students: int = Field(default=35, ge=1, le=150)
 
 
 class LobbyResponse(BaseModel):
     id: uuid.UUID
     instructor_id: int
+    subject: str = ""
     title: str
     language: Literal["c", "java", "python"]
+    max_students: int = 35
     status: str  # ACTIVE | LOCKED
     created_at: datetime
     expires_at: datetime
@@ -108,5 +120,6 @@ class LobbyDetailResponse(LobbyResponse):
 
 class LobbyPublicStatus(BaseModel):
     active: bool
+    subject: str = ""
     title: str
     language: Literal["c", "java", "python"]

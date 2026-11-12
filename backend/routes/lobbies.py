@@ -4,8 +4,9 @@ Lobby management routes for instructors and public lobby status query.
 
 from __future__ import annotations
 
+import os
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
@@ -21,6 +22,14 @@ from backend.schemas import (
 from backend.security import get_current_instructor
 
 router = APIRouter(tags=["Lobbies"])
+
+
+def _shareable_lobby_url(request: Request, lobby_id: uuid.UUID) -> str:
+    """Builds a student URL using the configured public origin when available."""
+    base_url = os.getenv("PUBLIC_BASE_URL", "").strip().rstrip("/")
+    if not base_url:
+        base_url = str(request.base_url).rstrip("/")
+    return f"{base_url}/lobby/{lobby_id}"
 
 
 @router.post("/lobbies", response_model=LobbyResponse, status_code=status.HTTP_201_CREATED)
@@ -40,8 +49,10 @@ def create_lobby(
     lobby = Lobby(
         id=uuid.uuid4(),
         instructor_id=current_instructor.id,
+        subject=payload.subject.strip(),
         title=payload.title.strip(),
         language=payload.language,
+        max_students=payload.max_students,
         status="ACTIVE",
         created_at=now,
         expires_at=expires_at,
@@ -51,14 +62,15 @@ def create_lobby(
     db.refresh(lobby)
 
     # Construct shareable URL
-    base_url = str(request.base_url).rstrip("/")
-    shareable_url = f"{base_url}/lobby/{lobby.id}"
+    shareable_url = _shareable_lobby_url(request, lobby.id)
 
     return LobbyResponse(
         id=lobby.id,
         instructor_id=lobby.instructor_id,
+        subject=lobby.subject,
         title=lobby.title,
         language=lobby.language,
+        max_students=lobby.max_students,
         status=lobby.status,
         created_at=lobby.created_at,
         expires_at=lobby.expires_at,
@@ -84,7 +96,6 @@ def get_instructor_lobbies(
         .all()
     )
 
-    base_url = str(request.base_url).rstrip("/")
     result: List[LobbyResponse] = []
 
     for lobby in lobbies:
@@ -97,12 +108,14 @@ def get_instructor_lobbies(
             LobbyResponse(
                 id=lobby.id,
                 instructor_id=lobby.instructor_id,
+                subject=lobby.subject,
                 title=lobby.title,
                 language=lobby.language,
+                max_students=lobby.max_students,
                 status=lobby.status,
                 created_at=lobby.created_at,
                 expires_at=lobby.expires_at,
-                shareable_url=f"{base_url}/lobby/{lobby.id}",
+                shareable_url=_shareable_lobby_url(request, lobby.id),
             )
         )
 
@@ -135,16 +148,17 @@ def get_lobby_detail(
         lobby.status = "LOCKED"
         db.commit()
 
-    base_url = str(request.base_url).rstrip("/")
     return LobbyDetailResponse(
         id=lobby.id,
         instructor_id=lobby.instructor_id,
+        subject=lobby.subject,
         title=lobby.title,
         language=lobby.language,
+        max_students=lobby.max_students,
         status=lobby.status,
         created_at=lobby.created_at,
         expires_at=lobby.expires_at,
-        shareable_url=f"{base_url}/lobby/{lobby.id}",
+        shareable_url=_shareable_lobby_url(request, lobby.id),
         submissions=lobby.submissions,
     )
 
@@ -173,17 +187,83 @@ def lock_lobby(
     db.commit()
     db.refresh(lobby)
 
-    base_url = str(request.base_url).rstrip("/")
     return LobbyResponse(
         id=lobby.id,
         instructor_id=lobby.instructor_id,
+        subject=lobby.subject,
         title=lobby.title,
         language=lobby.language,
+        max_students=lobby.max_students,
         status=lobby.status,
         created_at=lobby.created_at,
         expires_at=lobby.expires_at,
-        shareable_url=f"{base_url}/lobby/{lobby.id}",
+        shareable_url=_shareable_lobby_url(request, lobby.id),
     )
+
+
+@router.post("/lobbies/{lobby_id}/unlock", response_model=LobbyResponse)
+def unlock_lobby(
+    lobby_id: uuid.UUID,
+    request: Request,
+    current_instructor: Instructor = Depends(get_current_instructor),
+    db: Session = Depends(get_db),
+) -> LobbyResponse:
+    """Reopens an owned lobby only while its configured duration remains active."""
+    lobby = db.query(Lobby).filter(Lobby.id == lobby_id).first()
+    if not lobby:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lobby not found")
+
+    if lobby.instructor_id != current_instructor.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to modify this lobby.",
+        )
+
+    if datetime.now(timezone.utc).replace(tzinfo=None) >= lobby.expires_at:
+        lobby.status = "LOCKED"
+        db.commit()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This lobby has expired and cannot be reopened.",
+        )
+
+    lobby.status = "ACTIVE"
+    db.commit()
+    db.refresh(lobby)
+
+    return LobbyResponse(
+        id=lobby.id,
+        instructor_id=lobby.instructor_id,
+        subject=lobby.subject,
+        title=lobby.title,
+        language=lobby.language,
+        max_students=lobby.max_students,
+        status=lobby.status,
+        created_at=lobby.created_at,
+        expires_at=lobby.expires_at,
+        shareable_url=_shareable_lobby_url(request, lobby.id),
+    )
+
+
+@router.delete("/lobbies/{lobby_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_lobby(
+    lobby_id: uuid.UUID,
+    current_instructor: Instructor = Depends(get_current_instructor),
+    db: Session = Depends(get_db),
+) -> None:
+    """Deletes an owned lobby and its related submissions."""
+    lobby = db.query(Lobby).filter(Lobby.id == lobby_id).first()
+    if not lobby:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lobby not found")
+
+    if lobby.instructor_id != current_instructor.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to delete this lobby.",
+        )
+
+    db.delete(lobby)
+    db.commit()
 
 
 @router.get("/public/lobbies/{lobby_id}/status", response_model=LobbyPublicStatus)
@@ -205,4 +285,9 @@ def get_public_lobby_status(
         db.commit()
 
     is_active = lobby.status == "ACTIVE" and datetime.utcnow() < lobby.expires_at
-    return LobbyPublicStatus(active=is_active, title=lobby.title, language=lobby.language)
+    return LobbyPublicStatus(
+        active=is_active,
+        subject=lobby.subject,
+        title=lobby.title,
+        language=lobby.language,
+    )

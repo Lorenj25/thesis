@@ -13,6 +13,7 @@ import uuid
 from datetime import datetime
 from typing import List
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, UploadFile, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from backend.database import get_db
@@ -69,6 +70,27 @@ def submit_code(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="This exam session is closed. Submissions are no longer accepted.",
         )
+
+    known_student = (
+        db.query(Submission.id)
+        .filter(
+            Submission.lobby_id == lobby_id,
+            Submission.student_id == clean_student_id,
+        )
+        .first()
+    )
+    if not known_student:
+        student_count = (
+            db.query(func.count(func.distinct(Submission.student_id)))
+            .filter(Submission.lobby_id == lobby_id)
+            .scalar()
+            or 0
+        )
+        if student_count >= lobby.max_students:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This lobby has reached its maximum number of students.",
+            )
 
     # Validate file count in request (1 to 3 files)
     if not files or len(files) < 1 or len(files) > 3:

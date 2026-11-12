@@ -6,6 +6,7 @@ import {
   Lock,
   Unlock,
   Download,
+  Trash2,
   Users,
   FileCode,
   CheckCircle2,
@@ -35,9 +36,12 @@ interface InstructorDashboardProps {
     language: Language;
     durationMinutes: number;
     maxStudents: number;
-  }) => Lobby;
-  onToggleLock: (lobbyId: string) => void;
+  }) => Promise<Lobby>;
+  onToggleLock: (lobbyId: string) => Promise<void>;
+  onDeleteLobby: (lobbyId: string) => Promise<void>;
   onSwitchToStudentView: (lobbyCode: string) => void;
+  onRefresh: () => Promise<void>;
+  errorMessage: string | null;
   theme: Theme;
   onToggleTheme: () => void;
   onLogout: () => void;
@@ -49,7 +53,10 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
   submissions,
   onCreateLobby,
   onToggleLock,
+  onDeleteLobby,
   onSwitchToStudentView,
+  onRefresh,
+  errorMessage,
   theme,
   onToggleTheme,
   onLogout,
@@ -61,6 +68,10 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDatasetModal, setShowDatasetModal] = useState(false);
   const [inspectedSubmission, setInspectedSubmission] = useState<Submission | null>(null);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [deletingLobbyId, setDeletingLobbyId] = useState<string | null>(null);
 
   const [subject, setSubject] = useState('');
   const [title, setTitle] = useState('');
@@ -118,39 +129,95 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
   const totalHighRisk = submissions.filter((s) => s.riskLevel === 'High').length;
   const activeLobbyCount = lobbies.filter((l) => l.status === 'ACTIVE').length;
 
-  const handleCreateLobbySubmit = (e: React.FormEvent) => {
+  const handleCreateLobbySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!subject.trim() || !title.trim()) return;
 
-    const newLobby = onCreateLobby({
-      subject: subject.trim(),
-      title: title.trim(),
-      language,
-      durationMinutes: Number(durationMinutes),
-      maxStudents: Number(maxStudents),
-    });
+    setCreateError(null);
+    setIsCreating(true);
+    try {
+      const newLobby = await onCreateLobby({
+        subject: subject.trim(),
+        title: title.trim(),
+        language,
+        durationMinutes: Number(durationMinutes),
+        maxStudents: Number(maxStudents),
+      });
 
-    setSelectedLobbyId(newLobby.id);
-    setShowCreateModal(false);
-    setSubject('');
-    setTitle('');
-    setLanguage('python');
-    setSection('lobbies');
+      setSelectedLobbyId(newLobby.id);
+      setShowCreateModal(false);
+      setSubject('');
+      setTitle('');
+      setLanguage('python');
+      setSection('lobbies');
+    } catch (error) {
+      setCreateError(error instanceof Error ? error.message : 'Unable to create the lobby.');
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   const handleCopyCode = () => {
     if (!activeLobby) return;
-    navigator.clipboard.writeText(activeLobby.code);
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
+    if (!navigator.clipboard?.writeText) {
+      window.prompt('Share this lobby code:', activeLobby.code);
+      return;
+    }
+    navigator.clipboard.writeText(activeLobby.code).then(() => {
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    }).catch(() => {
+      window.prompt('Share this lobby code:', activeLobby.code);
+    });
   };
 
   const handleCopyLink = () => {
     if (!activeLobby) return;
-    const url = `${window.location.origin}?lobby=${activeLobby.code}`;
-    navigator.clipboard.writeText(url);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
+    if (!activeLobby.shareableUrl) {
+      setActionError('This lobby does not have a shareable link yet. Refresh and try again.');
+      return;
+    }
+    const url = activeLobby.shareableUrl;
+    if (!navigator.clipboard?.writeText) {
+      window.prompt('Share this lobby link:', url);
+      return;
+    }
+    navigator.clipboard.writeText(url).then(() => {
+      setActionError(null);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    }).catch(() => {
+      window.prompt('Share this lobby link:', url);
+    });
+  };
+
+  const handleToggleActiveLobby = async () => {
+    if (!activeLobby) return;
+    setActionError(null);
+    try {
+      await onToggleLock(activeLobby.id);
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : 'Unable to update the lobby.');
+    }
+  };
+
+  const handleDeleteActiveLobby = async () => {
+    if (!activeLobby) return;
+    const confirmed = window.confirm(
+      `Delete "${activeLobby.subject}${activeLobby.title ? ` - ${activeLobby.title}` : ''}"?\n\nThis also permanently deletes all submissions in this lobby.`,
+    );
+    if (!confirmed) return;
+
+    setActionError(null);
+    setDeletingLobbyId(activeLobby.id);
+    try {
+      await onDeleteLobby(activeLobby.id);
+      setSelectedLobbyId('');
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : 'Unable to delete the lobby.');
+    } finally {
+      setDeletingLobbyId(null);
+    }
   };
 
   const handleExportCSV = () => {
@@ -259,6 +326,11 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
       </aside>
 
       <div className="flex-1 min-w-0 space-y-6">
+        {(errorMessage || actionError) && (
+          <div className="rounded-xl border border-ca-border bg-ca-danger-soft px-4 py-3 text-sm text-ca-danger">
+            {actionError || errorMessage}
+          </div>
+        )}
         {section === 'dashboard' && (
           <div className="space-y-6 ca-fade-up">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -272,6 +344,13 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => void onRefresh()}
+                  className="h-10 px-3.5 rounded-xl bg-ca-surface/95 hover:bg-ca-surface-hover text-ca-ink border border-ca-border text-xs font-semibold transition-colors cursor-pointer"
+                >
+                  Refresh
+                </button>
                 <button
                   onClick={() => setShowDatasetModal(true)}
                   className="h-10 px-3.5 rounded-xl bg-ca-surface/95 hover:bg-ca-surface-hover text-ca-ink border border-ca-border text-xs font-semibold inline-flex items-center gap-2 transition-colors cursor-pointer backdrop-blur-md"
@@ -476,7 +555,7 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                             <span>{copiedLink ? 'Copied' : 'Copy link'}</span>
                           </button>
                           <button
-                            onClick={() => onToggleLock(activeLobby.id)}
+                            onClick={() => void handleToggleActiveLobby()}
                             className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border ${
                               activeLobby.status === 'ACTIVE'
                                 ? 'bg-ca-danger-soft text-ca-danger border-transparent'
@@ -494,6 +573,16 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                                 <span>Unlock</span>
                               </>
                             )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => void handleDeleteActiveLobby()}
+                            disabled={deletingLobbyId === activeLobby.id}
+                            title="Delete lobby and all its submissions"
+                            className="px-3 py-2 rounded-xl bg-ca-danger-soft text-ca-danger border border-transparent text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-wait"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>{deletingLobbyId === activeLobby.id ? 'Deleting...' : 'Delete lobby'}</span>
                           </button>
                         </div>
                       </div>
@@ -816,6 +905,11 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
             </div>
 
             <form onSubmit={handleCreateLobbySubmit} className="space-y-4">
+              {createError && (
+                <div className="rounded-xl border border-ca-border bg-ca-danger-soft px-3.5 py-3 text-sm text-ca-danger">
+                  {createError}
+                </div>
+              )}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-ca-muted mb-1.5">
                   Subject / Course Code <span className="text-ca-brand">*</span>
@@ -909,9 +1003,10 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-ca-brand hover:bg-ca-brand-hover text-ca-brand-ink font-black text-xs cursor-pointer"
+                  disabled={isCreating}
+                  className="px-5 py-2.5 rounded-xl bg-ca-brand hover:bg-ca-brand-hover text-ca-brand-ink font-black text-xs cursor-pointer disabled:opacity-50 disabled:cursor-wait"
                 >
-                  Generate Lobby & Link
+                  {isCreating ? 'Saving lobby...' : 'Generate Lobby & Link'}
                 </button>
               </div>
             </form>

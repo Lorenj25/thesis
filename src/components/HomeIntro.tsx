@@ -67,7 +67,7 @@ export const HomeIntro: React.FC<HomeIntroProps> = ({
             {
               step: '01',
               title: 'Instructor Creates Lobby',
-              body: 'Specifies course subject, section, time duration, and max student access limit. Generates a 6-character code and shareable link.',
+              body: 'Specifies the course, section, language, and duration. The server saves a unique lobby code and shareable link.',
             },
             {
               step: '02',

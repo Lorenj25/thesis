@@ -24,6 +24,7 @@ export interface Lobby {
   expiresAt: string;
   status: LobbyStatus;
   maxUploadsPerStudent: number; // Always 3
+  shareableUrl?: string;
 }
 
 export interface Submission {

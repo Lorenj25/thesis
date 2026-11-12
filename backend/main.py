@@ -39,10 +39,7 @@ async def lifespan(app: FastAPI):
     print("[STARTUP] AsyncIO event loop registered for background broadcasts.")
 
     # 2. Initialize database tables in development
-    try:
-        create_tables()
-    except Exception as exc:
-        print(f"[STARTUP WARNING] Database table creation deferred: {exc}")
+    create_tables()
 
     yield
 

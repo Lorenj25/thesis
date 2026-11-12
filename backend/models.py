@@ -13,6 +13,7 @@ from typing import List, Optional
 from sqlalchemy import (
     Column,
     DateTime,
+    Boolean,
     Float,
     ForeignKey,
     Index,
@@ -38,6 +39,7 @@ class Instructor(Base):
     email = Column(String(255), unique=True, index=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    is_verified = Column(Boolean, default=True, server_default="true", nullable=False)
 
     # Relationships
     lobbies = relationship(
@@ -65,8 +67,10 @@ class Lobby(Base):
         nullable=False,
         index=True,
     )
+    subject = Column(String(255), default="", server_default="", nullable=False)
     title = Column(String(255), nullable=False)
     language = Column(String(20), default="python", server_default="python", nullable=False)
+    max_students = Column(Integer, default=35, server_default="35", nullable=False)
     status = Column(String(20), default="ACTIVE", nullable=False)  # ACTIVE | LOCKED
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     expires_at = Column(DateTime, nullable=False)
@@ -126,3 +130,19 @@ class Submission(Base):
             f"<Submission(id={self.id}, student='{self.student_id}', file='{self.file_name}', "
             f"lang='{self.language}', status='{self.status}', ai_prob={self.ai_probability})>"
         )
+
+
+class EmailVerificationToken(Base):
+    """Single-use email verification token stored only as a SHA-256 digest."""
+    __tablename__ = "email_verification_tokens"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    instructor_id = Column(
+        Integer,
+        ForeignKey("instructors.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    token_hash = Column(String(64), unique=True, nullable=False, index=True)
+    expires_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Sun, Moon, LogOut, User, Terminal, X, Home, Sparkles } from 'lucide-react';
+import { Sun, Moon, LogOut, User, Terminal, X, Home } from 'lucide-react';
 import { Instructor, Theme } from '../types';
 import csuCcisLogo from '../assets/CSU-CCIS.png';
 import logoutLeaveArt from '../assets/logout-leave.png';
@@ -9,7 +9,6 @@ interface NavbarProps {
   setCurrentView: (view: 'home' | 'instructor' | 'student') => void;
   instructor: Instructor | null;
   onLogout: () => void;
-  onDemoLogin: () => void;
   theme: Theme;
   onToggleTheme: () => void;
   logoutConfirmOpen: boolean;
@@ -21,7 +20,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   setCurrentView,
   instructor,
   onLogout,
-  onDemoLogin,
   theme,
   onToggleTheme,
   logoutConfirmOpen,
@@ -224,19 +222,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>Student</span>
           </button>
 
-          {!instructor && (
-            <button
-              type="button"
-              onClick={() => {
-                onDemoLogin();
-                setMenuOpen(false);
-              }}
-              className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-ca-brand hover:bg-ca-brand-soft transition-colors mt-2"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>One-Click Demo Login</span>
-            </button>
-          )}
         </nav>
 
         <div className="pt-4 mt-auto border-t border-ca-border space-y-1">

@@ -44,7 +44,7 @@ def run_test() -> int:
     print("  SUCCESS: Connected to database.")
 
     # 2. Table Creation
-    print("\n[2/3] Creating tables (Instructor, Lobby, Submission)...")
+    print("\n[2/3] Migrating legacy tables and creating current tables...")
     try:
         create_tables()
         print("  SUCCESS: Table creation executed without errors.")
@@ -99,8 +99,7 @@ def run_test() -> int:
         if not all_present:
             print(
                 "  FAILED: Database schema does not match the current ORM models. "
-                "Existing tables are not migrated by create_all(); migrate the database "
-                "before using the API."
+                "Review migration errors and retained legacy tables before using the API."
             )
             return 1
 
