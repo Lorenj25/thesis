@@ -47,7 +47,7 @@ def create_lobby(
     expires_at = now + timedelta(minutes=payload.duration_minutes)
 
     lobby = Lobby(
-        id=uuid.uuid4(),
+        id=str(uuid.uuid4()),
         instructor_id=current_instructor.id,
         subject=payload.subject.strip(),
         title=payload.title.strip(),
@@ -133,7 +133,7 @@ def get_lobby_detail(
     Retrieves full lobby details including all student submissions.
     Enforces ownership check: instructors can only view their own lobbies.
     """
-    lobby = db.query(Lobby).filter(Lobby.id == lobby_id).first()
+    lobby = db.query(Lobby).filter(Lobby.id == str(lobby_id)).first()
     if not lobby:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lobby not found")
 
@@ -173,7 +173,7 @@ def lock_lobby(
     """
     Manually locks an active lobby session.
     """
-    lobby = db.query(Lobby).filter(Lobby.id == lobby_id).first()
+    lobby = db.query(Lobby).filter(Lobby.id == str(lobby_id)).first()
     if not lobby:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lobby not found")
 
@@ -209,7 +209,7 @@ def unlock_lobby(
     db: Session = Depends(get_db),
 ) -> LobbyResponse:
     """Reopens an owned lobby only while its configured duration remains active."""
-    lobby = db.query(Lobby).filter(Lobby.id == lobby_id).first()
+    lobby = db.query(Lobby).filter(Lobby.id == str(lobby_id)).first()
     if not lobby:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lobby not found")
 
@@ -252,7 +252,7 @@ def delete_lobby(
     db: Session = Depends(get_db),
 ) -> None:
     """Deletes an owned lobby and its related submissions."""
-    lobby = db.query(Lobby).filter(Lobby.id == lobby_id).first()
+    lobby = db.query(Lobby).filter(Lobby.id == str(lobby_id)).first()
     if not lobby:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lobby not found")
 
@@ -275,7 +275,7 @@ def get_public_lobby_status(
     Public endpoint for student portal check.
     Returns ONLY active flag and title. Never returns submissions or scores.
     """
-    lobby = db.query(Lobby).filter(Lobby.id == lobby_id).first()
+    lobby = db.query(Lobby).filter(Lobby.id == str(lobby_id)).first()
     if not lobby:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lobby not found")
 

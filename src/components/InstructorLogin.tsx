@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
-import { AlertTriangle, KeyRound, MailCheck } from 'lucide-react';
+import { AlertTriangle, KeyRound } from 'lucide-react';
 import { Instructor } from '../types';
-import {
-  ApiRequestError,
-  loginInstructor,
-  registerInstructor,
-  resendInstructorVerification,
-} from '../utils/api';
+import { loginInstructor, registerInstructor } from '../utils/api';
 import heroHall from '../assets/HB.png';
 
 interface InstructorLoginProps {
@@ -20,8 +15,6 @@ export const InstructorLogin: React.FC<InstructorLoginProps> = ({ onLogin }) => 
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [verificationSent, setVerificationSent] = useState(false);
-  const [resendMessage, setResendMessage] = useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -31,8 +24,6 @@ export const InstructorLogin: React.FC<InstructorLoginProps> = ({ onLogin }) => 
     try {
       if (isRegistering) {
         await registerInstructor(name.trim(), email.trim(), password);
-        setVerificationSent(true);
-        return;
       }
       const token = await loginInstructor(email.trim(), password);
       const cleanEmail = email.trim().toLowerCase();
@@ -42,34 +33,10 @@ export const InstructorLogin: React.FC<InstructorLoginProps> = ({ onLogin }) => 
         name: name.trim() || cleanEmail.split('@')[0],
       }, token);
     } catch (requestError) {
-      if (requestError instanceof ApiRequestError && requestError.status === 503) {
-        setVerificationSent(true);
-      }
-      if (requestError instanceof ApiRequestError && requestError.status === 403) {
-        setVerificationSent(true);
-      }
       setError(
         requestError instanceof Error
           ? requestError.message
           : 'Unable to sign in. Please try again.',
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleResendVerification = async () => {
-    setError(null);
-    setResendMessage(null);
-    setIsSubmitting(true);
-    try {
-      await resendInstructorVerification(email.trim());
-      setResendMessage('If this account needs confirmation, a verification email has been sent.');
-    } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : 'Unable to resend the confirmation email.',
       );
     } finally {
       setIsSubmitting(false);
@@ -101,40 +68,7 @@ export const InstructorLogin: React.FC<InstructorLoginProps> = ({ onLogin }) => 
               </div>
             )}
 
-            {verificationSent ? (
-              <div className="space-y-4">
-                <div className="p-3 rounded-xl bg-ca-brand/10 border border-ca-border text-ca-ink text-sm flex items-start gap-2">
-                  <MailCheck className="w-5 h-5 shrink-0 text-ca-brand" />
-                  <span>
-                    Check {email.trim()} for a confirmation link. You must confirm your email
-                    before signing in.
-                  </span>
-                </div>
-                {resendMessage && (
-                  <p className="text-xs text-ca-muted" role="status">{resendMessage}</p>
-                )}
-                <button
-                  type="button"
-                  onClick={handleResendVerification}
-                  disabled={isSubmitting || !email.trim()}
-                  className="ca-btn-primary w-full"
-                >
-                  {isSubmitting ? 'Please wait...' : 'Resend confirmation email'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setVerificationSent(false);
-                    setIsRegistering(false);
-                    setError(null);
-                    setResendMessage(null);
-                  }}
-                  className="w-full text-xs font-semibold text-ca-brand hover:underline cursor-pointer"
-                >
-                  Back to sign in
-                </button>
-              </div>
-            ) : <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {isRegistering && (
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-ca-muted mb-1.5">
@@ -187,9 +121,9 @@ export const InstructorLogin: React.FC<InstructorLoginProps> = ({ onLogin }) => 
                     ? 'Create Account'
                     : 'Sign In to Dashboard'}
               </button>
-            </form>}
+            </form>
 
-            {!verificationSent && <button
+            <button
               type="button"
               onClick={() => {
                 setIsRegistering((registering) => !registering);
@@ -200,7 +134,7 @@ export const InstructorLogin: React.FC<InstructorLoginProps> = ({ onLogin }) => 
               {isRegistering
                 ? 'Already have an account? Sign in'
                 : 'New instructor? Create an account'}
-            </button>}
+            </button>
           </div>
         </div>
       </div>

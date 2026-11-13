@@ -34,14 +34,6 @@ class InstructorLogin(BaseModel):
     password: str
 
 
-class VerificationRequest(BaseModel):
-    email: EmailStr
-
-
-class VerificationMessage(BaseModel):
-    message: str
-
-
 class InstructorResponse(InstructorBase):
     id: int
     created_at: datetime

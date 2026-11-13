@@ -20,7 +20,6 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
-    Uuid,
 )
 from sqlalchemy.orm import relationship
 
@@ -60,7 +59,7 @@ class Lobby(Base):
     """
     __tablename__ = "lobbies"
 
-    id = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     instructor_id = Column(
         Integer,
         ForeignKey("instructors.id", ondelete="CASCADE"),
@@ -102,7 +101,7 @@ class Submission(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     lobby_id = Column(
-        Uuid(as_uuid=True),
+        String(36),
         ForeignKey("lobbies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
@@ -132,17 +131,3 @@ class Submission(Base):
         )
 
 
-class EmailVerificationToken(Base):
-    """Single-use email verification token stored only as a SHA-256 digest."""
-    __tablename__ = "email_verification_tokens"
-
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    instructor_id = Column(
-        Integer,
-        ForeignKey("instructors.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
-    )
-    token_hash = Column(String(64), unique=True, nullable=False, index=True)
-    expires_at = Column(DateTime, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

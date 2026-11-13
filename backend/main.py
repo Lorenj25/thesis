@@ -100,7 +100,7 @@ async def lobby_websocket_endpoint(
     db = SessionLocal()
     try:
         lobby_uuid = uuid.UUID(lobby_id)
-        lobby = db.query(Lobby).filter(Lobby.id == lobby_uuid).first()
+        lobby = db.query(Lobby).filter(Lobby.id == str(lobby_uuid)).first()
         if not lobby or lobby.instructor_id != token_data.instructor_id:
             await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
             return

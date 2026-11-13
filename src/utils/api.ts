@@ -134,14 +134,6 @@ export async function registerInstructor(
   });
 }
 
-export async function resendInstructorVerification(email: string): Promise<void> {
-  await request('/auth/resend-verification', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email }),
-  });
-}
-
 export async function loadInstructorData(token: string): Promise<{
   lobbies: Lobby[];
   submissions: Submission[];

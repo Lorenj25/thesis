@@ -54,7 +54,7 @@ def submit_code(
     clean_student_id = student_id.strip()
 
     # Stage 1: Validate lobby existence and active window
-    lobby = db.query(Lobby).filter(Lobby.id == lobby_id).first()
+    lobby = db.query(Lobby).filter(Lobby.id == str(lobby_id)).first()
     if not lobby:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -74,7 +74,7 @@ def submit_code(
     known_student = (
         db.query(Submission.id)
         .filter(
-            Submission.lobby_id == lobby_id,
+            Submission.lobby_id == str(lobby_id),
             Submission.student_id == clean_student_id,
         )
         .first()
@@ -82,7 +82,7 @@ def submit_code(
     if not known_student:
         student_count = (
             db.query(func.count(func.distinct(Submission.student_id)))
-            .filter(Submission.lobby_id == lobby_id)
+            .filter(Submission.lobby_id == str(lobby_id))
             .scalar()
             or 0
         )
@@ -120,7 +120,7 @@ def submit_code(
     # Stage 5 check upfront: Check existing files for this student in this lobby
     existing_count = (
         db.query(Submission)
-        .filter(Submission.lobby_id == lobby_id, Submission.student_id == clean_student_id)
+        .filter(Submission.lobby_id == str(lobby_id), Submission.student_id == clean_student_id)
         .count()
     )
     if existing_count + len(files) > MAX_FILES_PER_STUDENT:
@@ -180,7 +180,7 @@ def submit_code(
 
         # Create pending submission record
         sub = Submission(
-            lobby_id=lobby_id,
+            lobby_id=str(lobby_id),
             student_id=clean_student_id,
             file_name=filename,
             language=language,

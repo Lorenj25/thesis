@@ -7,8 +7,8 @@
 
 ## Tech Stack
 - **Backend**: Python 3.10+, FastAPI, Uvicorn (single worker)
-- **Database**: PostgreSQL (local), SQLAlchemy 2.x
-- **Authentication**: JWT (`python-jose`) with `passlib[bcrypt]`
+- **Database**: PostgreSQL (local), SQLAlchemy 2.x, Supabase
+- **Authentication**: JWT (`python-jose`) with `passluib[bcrypt]`
 - **ML / NLP Pipeline**: PyTorch, Hugging Face `transformers` (CodeBERT frozen representations), `datasets`, `accelerate`, `scikit-learn`, `joblib`, `numpy`
 - **Frontend**: Plain HTML5, CSS3, Vanilla JavaScript served directly by FastAPI StaticFiles, plus React SPA live preview console
 
@@ -79,13 +79,10 @@ python -m ml.demo --file path/to/student_code.py
 
 ## Running the Web System
 
-### Instructor email confirmation
-New instructor accounts must confirm their email address before signing in. Copy
-the SMTP settings from [.env.example](./.env.example) into your local `.env` file
-and replace the example values with credentials from your mail provider. Do not
-commit `.env`. Set `API_PUBLIC_URL` to the public backend origin so confirmation
-links can reach the API. If delivery fails, the account remains unverified and
-the sign-in page offers a resend action after the SMTP settings are corrected.
+### Instructor accounts
+Instructor accounts can sign in immediately after registration; email confirmation
+is not required. Password-based sign-in is still required to access the instructor
+dashboard and manage lobbies.
 
 If the connected PostgreSQL database has the older incompatible instructor/lobby
 schema, back it up and explicitly set `ALLOW_LEGACY_SCHEMA_MIGRATION=true`
