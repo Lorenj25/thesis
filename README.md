@@ -129,11 +129,12 @@ npm run dev
 This starts FastAPI on port 8000 and Vite on port 3000; Vite proxies API and lobby
 requests to FastAPI. Press Ctrl+C to stop both services. To run one service separately,
 use `npm run dev:backend` or `npm run dev:frontend`.
-The root `vercel.json` forwards auth, lobby, and public API requests to the Render backend.
-On Vercel, either leave `VITE_API_BASE_URL` unset to use these rewrites, or set it to the
-backend origin and redeploy. If the server's public address differs from the request host
-(for example, localhost or a reverse proxy), set `PUBLIC_BASE_URL` in the backend
-environment to the public backend origin that serves `/lobby/{uuid}`. Instructors must
+In production, the frontend calls the Render API directly so bearer-token authorization
+headers reach FastAPI. The default API origin is `https://thesis-ifng.onrender.com`; set
+`VITE_API_BASE_URL` to override it for another deployment. If the server's public address
+differs from the request host (for example, localhost or a reverse proxy), set
+`PUBLIC_BASE_URL` in the backend environment to the public backend origin that serves
+`/lobby/{uuid}`. Instructors must
 sign in with a registered account; generated lobby UUIDs and links resolve through the
 backend, so sharing works across browsers and devices connected to that deployment.
 For local network sharing, open the dashboard using the host machine's LAN address rather

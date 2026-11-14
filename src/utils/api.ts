@@ -1,6 +1,10 @@
 import { Instructor, Language, Lobby, Submission } from '../types';
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+const DEFAULT_PRODUCTION_API_URL = 'https://thesis-ifng.onrender.com';
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.PROD ? DEFAULT_PRODUCTION_API_URL : '')
+).replace(/\/$/, '');
 const TOKEN_KEY = 'codeauthentic_token';
 
 export class ApiRequestError extends Error {
