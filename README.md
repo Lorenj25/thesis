@@ -84,6 +84,13 @@ Instructor accounts can sign in immediately after registration; email confirmati
 is not required. Password-based sign-in is still required to access the instructor
 dashboard and manage lobbies.
 
+### Database configuration
+Database settings belong in the repository-root `.env` file. To use Supabase,
+replace the active `DATABASE_URL` with the PostgreSQL connection URL from the
+commented template there, adding the database password locally. URL-encode
+reserved characters in the password and do not commit `.env`. The current
+database remains active until `DATABASE_URL` is replaced.
+
 If the connected PostgreSQL database has the older incompatible instructor/lobby
 schema, back it up and explicitly set `ALLOW_LEGACY_SCHEMA_MIGRATION=true`
 before starting the backend. The migration renames the old tables with a

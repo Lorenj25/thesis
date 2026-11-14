@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AlertTriangle, KeyRound } from 'lucide-react';
 import { Instructor } from '../types';
-import { loginInstructor, registerInstructor } from '../utils/api';
+import { ApiRequestError, loginInstructor, registerInstructor } from '../utils/api';
 import heroHall from '../assets/HB.png';
 
 interface InstructorLoginProps {
@@ -14,16 +14,22 @@ export const InstructorLogin: React.FC<InstructorLoginProps> = ({ onLogin }) => 
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
+    setSuccess(null);
     setIsSubmitting(true);
 
     try {
       if (isRegistering) {
         await registerInstructor(name.trim(), email.trim(), password);
+        setIsRegistering(false);
+        setPassword('');
+        setSuccess('Account created. Sign in with your email and password.');
+        return;
       }
       const token = await loginInstructor(email.trim(), password);
       const cleanEmail = email.trim().toLowerCase();
@@ -33,6 +39,10 @@ export const InstructorLogin: React.FC<InstructorLoginProps> = ({ onLogin }) => 
         name: name.trim() || cleanEmail.split('@')[0],
       }, token);
     } catch (requestError) {
+      if (requestError instanceof ApiRequestError && requestError.status === 404) {
+        setError('The account service was not found. Restart the backend and refresh this page.');
+        return;
+      }
       setError(
         requestError instanceof Error
           ? requestError.message
@@ -65,6 +75,14 @@ export const InstructorLogin: React.FC<InstructorLoginProps> = ({ onLogin }) => 
               <div className="p-3 rounded-xl bg-ca-danger-soft border border-ca-border text-ca-danger text-xs flex items-start gap-2">
                 <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                 <span>{error}</span>
+              </div>
+            )}
+            {success && (
+              <div
+                className="p-3 rounded-xl bg-ca-brand/10 border border-ca-border text-ca-ink text-sm"
+                role="status"
+              >
+                {success}
               </div>
             )}
 
@@ -128,6 +146,7 @@ export const InstructorLogin: React.FC<InstructorLoginProps> = ({ onLogin }) => 
               onClick={() => {
                 setIsRegistering((registering) => !registering);
                 setError(null);
+                setSuccess(null);
               }}
               className="w-full text-xs font-semibold text-ca-brand hover:underline cursor-pointer"
             >

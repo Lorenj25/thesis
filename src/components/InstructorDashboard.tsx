@@ -201,23 +201,26 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
     }
   };
 
-  const handleDeleteActiveLobby = async () => {
-    if (!activeLobby) return;
+  const handleDeleteLobby = async (lobby: Lobby) => {
     const confirmed = window.confirm(
-      `Delete "${activeLobby.subject}${activeLobby.title ? ` - ${activeLobby.title}` : ''}"?\n\nThis also permanently deletes all submissions in this lobby.`,
+      `Delete "${lobby.subject}${lobby.title ? ` - ${lobby.title}` : ''}"?\n\nThis also permanently deletes all submissions in this lobby.`,
     );
     if (!confirmed) return;
 
     setActionError(null);
-    setDeletingLobbyId(activeLobby.id);
+    setDeletingLobbyId(lobby.id);
     try {
-      await onDeleteLobby(activeLobby.id);
-      setSelectedLobbyId('');
+      await onDeleteLobby(lobby.id);
+      if (selectedLobbyId === lobby.id) setSelectedLobbyId('');
     } catch (error) {
       setActionError(error instanceof Error ? error.message : 'Unable to delete the lobby.');
     } finally {
       setDeletingLobbyId(null);
     }
+  };
+
+  const handleDeleteActiveLobby = async () => {
+    if (activeLobby) await handleDeleteLobby(activeLobby);
   };
 
   const handleExportCSV = () => {
@@ -473,39 +476,61 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                       const subCount = submissions.filter((s) => s.lobbyId === lobby.id).length;
 
                       return (
-                        <button
+                        <div
                           key={lobby.id}
-                          type="button"
-                          onClick={() => selectLobby(lobby.id)}
-                          className={`w-full text-left p-3.5 rounded-xl border transition-colors cursor-pointer ${
+                          className={`rounded-xl border transition-colors ${
                             isSelected
                               ? 'bg-ca-brand-soft border-ca-brand'
-                              : 'bg-ca-surface-2/80 border-ca-border hover:border-ca-border-strong'
+                              : 'bg-ca-surface-2/80 border-ca-border'
                           }`}
                         >
-                          <div className="flex items-center gap-2 min-w-0">
-                            <span className="font-mono text-[11px] font-bold text-ca-brand shrink-0">
-                              {lobby.code}
-                            </span>
-                            <span className="text-sm font-semibold text-ca-ink truncate min-w-0 flex-1">
-                              {lobby.subject}
-                            </span>
-                            <span
-                              className={`shrink-0 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md whitespace-nowrap ${
-                                isLocked
-                                  ? 'bg-ca-bg-elevated text-ca-muted'
-                                  : 'bg-ca-ok-soft text-ca-ok'
-                              }`}
-                            >
-                              {lobby.status}
-                            </span>
-                          </div>
-                          <p className="text-xs text-ca-muted mt-1.5 line-clamp-1">{lobby.title}</p>
-                          <div className="mt-3 flex items-center justify-between text-[11px] text-ca-faint">
-                            <span>Max {lobby.maxStudents}</span>
-                            <span>{subCount} files</span>
-                          </div>
-                        </button>
+                          <button
+                            type="button"
+                            onClick={() => selectLobby(lobby.id)}
+                            className={`w-full text-left p-3.5 transition-colors cursor-pointer ${
+                              isSelected ? 'bg-ca-brand-soft' : 'hover:bg-ca-surface-hover'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="font-mono text-[11px] font-bold text-ca-brand shrink-0">
+                                {lobby.code}
+                              </span>
+                              <span className="text-sm font-semibold text-ca-ink truncate min-w-0 flex-1">
+                                {lobby.subject}
+                              </span>
+                              <span
+                                className={`shrink-0 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md whitespace-nowrap ${
+                                  isLocked
+                                    ? 'bg-ca-bg-elevated text-ca-muted'
+                                    : 'bg-ca-ok-soft text-ca-ok'
+                                }`}
+                              >
+                                {lobby.status}
+                              </span>
+                            </div>
+                            <p className="text-xs text-ca-muted mt-1.5 line-clamp-1">{lobby.title}</p>
+                            <div className="mt-3 flex items-center justify-between text-[11px] text-ca-faint">
+                              <span>Max {lobby.maxStudents}</span>
+                              <span>{subCount} files</span>
+                            </div>
+                          </button>
+                          {isLocked && (
+                            <div className="px-3 pb-3">
+                              <button
+                                type="button"
+                                onClick={() => void handleDeleteLobby(lobby)}
+                                disabled={deletingLobbyId === lobby.id}
+                                title="Delete locked lobby and all its submissions"
+                                className="w-full px-3 py-2 rounded-lg bg-ca-danger-soft text-ca-danger text-xs font-semibold inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-wait"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span>
+                                  {deletingLobbyId === lobby.id ? 'Deleting...' : 'Delete locked lobby'}
+                                </span>
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       );
                     })
                   )}

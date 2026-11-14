@@ -87,6 +87,12 @@ def run_test() -> int:
                         continue
 
                     if expected_python_type != actual_python_type:
+                        if (
+                            isinstance(expected_type, models.GUID)
+                            and actual_python_type is str
+                            and getattr(actual_type, "length", None) == 36
+                        ):
+                            continue
                         print(
                             f"  [MISMATCH] Column '{tbl}.{column_name}' has type "
                             f"{actual_type}; ORM expects {expected_type}."

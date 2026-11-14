@@ -11,6 +11,7 @@ import uuid
 from datetime import datetime
 from typing import List, Optional
 from sqlalchemy import (
+    CHAR,
     Column,
     DateTime,
     Boolean,
@@ -21,9 +22,38 @@ from sqlalchemy import (
     String,
     Text,
 )
+from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
 from sqlalchemy.orm import relationship
+from sqlalchemy.types import TypeDecorator
 
 from backend.database import Base
+
+
+class GUID(TypeDecorator):
+    """Store native UUIDs in PostgreSQL and canonical UUID strings in SQLite."""
+
+    impl = CHAR(36)
+    cache_ok = True
+
+    @property
+    def python_type(self):
+        return uuid.UUID
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "postgresql":
+            return dialect.type_descriptor(PostgreSQLUUID(as_uuid=True))
+        return dialect.type_descriptor(CHAR(36))
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return None
+        normalized = value if isinstance(value, uuid.UUID) else uuid.UUID(str(value))
+        return normalized if dialect.name == "postgresql" else str(normalized)
+
+    def process_result_value(self, value, dialect):
+        if value is None or isinstance(value, uuid.UUID):
+            return value
+        return uuid.UUID(str(value))
 
 
 class Instructor(Base):
@@ -59,7 +89,7 @@ class Lobby(Base):
     """
     __tablename__ = "lobbies"
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(GUID(), primary_key=True, default=uuid.uuid4)
     instructor_id = Column(
         Integer,
         ForeignKey("instructors.id", ondelete="CASCADE"),
@@ -101,7 +131,7 @@ class Submission(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     lobby_id = Column(
-        String(36),
+        GUID(),
         ForeignKey("lobbies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
