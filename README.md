@@ -122,11 +122,13 @@ are rejected before a submission record is created.
 
 ### React dashboard and shareable lobbies
 The React dashboard also uses the FastAPI database for instructor accounts, lobbies, and
-student uploads. Run the backend above, then start the React app in a second terminal:
+student uploads. Start both services from the repository root in one terminal:
 ```bash
 npm run dev
 ```
-The Vite development server proxies API and lobby requests to `http://127.0.0.1:8000`.
+This starts FastAPI on port 8000 and Vite on port 3000; Vite proxies API and lobby
+requests to FastAPI. Press Ctrl+C to stop both services. To run one service separately,
+use `npm run dev:backend` or `npm run dev:frontend`.
 In deployments where the API is hosted separately, set `VITE_API_BASE_URL` to the backend
 origin when building the React app. If the server's public address differs from the request
 host (for example, localhost or a reverse proxy), set `PUBLIC_BASE_URL` in the backend
