@@ -20,11 +20,17 @@ export const CodeModal: React.FC<CodeModalProps> = ({ submission, onClose }) => 
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const getRiskClasses = (risk: string | null) => {
+  const getRiskClasses = (risk: string | null, status: Submission['status']) => {
+    if (status === 'failed') return 'text-ca-danger bg-ca-danger-soft border-ca-border';
     if (risk === 'High') return 'text-ca-danger bg-ca-danger-soft border-ca-border';
     if (risk === 'Medium') return 'text-ca-warn bg-ca-warn-soft border-ca-border';
-    return 'text-ca-ok bg-ca-ok-soft border-ca-border';
+    if (risk === 'Low') return 'text-ca-ok bg-ca-ok-soft border-ca-border';
+    return 'text-ca-muted bg-ca-bg-elevated border-ca-border';
   };
+  const analysisLabel =
+    submission.status === 'failed'
+      ? 'FAILED'
+      : submission.riskLevel || (submission.status === 'done' ? 'NO SCORE' : 'ANALYZING');
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ca-overlay backdrop-blur-sm ca-fade-in">
@@ -76,9 +82,9 @@ export const CodeModal: React.FC<CodeModalProps> = ({ submission, onClose }) => 
             <div>
               <span className="text-ca-faint block text-[10px] uppercase font-bold">Risk Assessment</span>
               <span
-                className={`inline-block px-2 py-0.5 rounded-md font-bold text-xs border ${getRiskClasses(submission.riskLevel)}`}
+                className={`inline-block px-2 py-0.5 rounded-md font-bold text-xs border ${getRiskClasses(submission.riskLevel, submission.status)}`}
               >
-                {submission.riskLevel || 'ANALYZING'} RISK
+                {analysisLabel}
               </span>
             </div>
             <div>
@@ -86,6 +92,16 @@ export const CodeModal: React.FC<CodeModalProps> = ({ submission, onClose }) => 
               <span className="font-mono text-ca-ink">{submission.tokenCount} tokens</span>
             </div>
           </div>
+
+          {submission.status === 'failed' && submission.errorMessage && (
+            <div
+              role="alert"
+              className="px-6 py-3 bg-ca-danger-soft border-b border-ca-border text-sm text-ca-danger"
+            >
+              <strong className="block mb-1">Analysis failed</strong>
+              <span>{submission.errorMessage}</span>
+            </div>
+          )}
 
           <div className="text-right">
             <span className="text-ca-faint block text-[10px] uppercase font-bold">Model Engine</span>

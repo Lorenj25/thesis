@@ -8,11 +8,12 @@ import os
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
+from backend.analysis import run_analysis
 from backend.database import get_db
-from backend.models import Instructor, Lobby
+from backend.models import Instructor, Lobby, Submission
 from backend.schemas import (
     LobbyCreate,
     LobbyDetailResponse,
@@ -126,6 +127,7 @@ def get_instructor_lobbies(
 def get_lobby_detail(
     lobby_id: uuid.UUID,
     request: Request,
+    background_tasks: BackgroundTasks,
     current_instructor: Instructor = Depends(get_current_instructor),
     db: Session = Depends(get_db),
 ) -> LobbyDetailResponse:
@@ -147,6 +149,23 @@ def get_lobby_detail(
     if lobby.status == "ACTIVE" and datetime.utcnow() >= lobby.expires_at:
         lobby.status = "LOCKED"
         db.commit()
+
+    for submission in list(lobby.submissions):
+        if submission.status != "pending":
+            continue
+        queued_submission = (
+            db.query(Submission)
+            .filter(
+                Submission.id == submission.id,
+                Submission.status == "pending",
+            )
+            .with_for_update()
+            .first()
+        )
+        if queued_submission:
+            queued_submission.status = "analyzing"
+            db.commit()
+            background_tasks.add_task(run_analysis, queued_submission.id)
 
     return LobbyDetailResponse(
         id=lobby.id,

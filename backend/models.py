@@ -140,7 +140,7 @@ class Submission(Base):
     file_name = Column(String(255), nullable=False)
     language = Column(String(20), nullable=False)  # c | java | python
     source_code = Column(Text, nullable=False)
-    status = Column(String(20), default="pending", nullable=False)  # pending | done | failed
+    status = Column(String(20), default="pending", nullable=False)  # pending | analyzing | done | failed
     ai_probability = Column(Float, nullable=True)  # 0.0 to 1.0 (nullable until done)
     risk_level = Column(String(20), nullable=True)  # Low | Medium | High
     error_message = Column(Text, nullable=True)

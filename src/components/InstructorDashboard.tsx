@@ -827,8 +827,21 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                         </tr>
                       ) : (
                         displayedSubmissions.map((sub) => {
-                          const prob = sub.aiProbability !== null ? sub.aiProbability : 0;
-                          const probPercent = (prob * 100).toFixed(1);
+                          const probability = sub.aiProbability;
+                          const statusLabel =
+                            sub.status === 'failed'
+                              ? 'Failed'
+                              : sub.riskLevel || (sub.status === 'done' ? 'No score' : 'Analyzing');
+                          const statusClass =
+                            sub.status === 'failed'
+                              ? 'bg-ca-danger-soft text-ca-danger'
+                              : sub.riskLevel === 'High'
+                                ? 'bg-ca-danger-soft text-ca-danger'
+                                : sub.riskLevel === 'Medium'
+                                  ? 'bg-ca-brand-soft text-ca-brand'
+                                  : sub.riskLevel === 'Low'
+                                    ? 'bg-ca-ok-soft text-ca-ok'
+                                    : 'bg-ca-bg-elevated text-ca-muted';
 
                           return (
                             <tr key={sub.id} className="hover:bg-ca-surface-hover/60 transition-colors">
@@ -841,32 +854,33 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                               </td>
                               <td className="py-3 px-4">
                                 <div className="space-y-1.5">
-                                  <span className="text-xs font-mono font-semibold text-ca-ink">{probPercent}%</span>
-                                  <div className="w-24 h-1.5 rounded-full bg-ca-bg-elevated overflow-hidden">
-                                    <div
-                                      className={`h-full rounded-full ${
-                                        sub.riskLevel === 'High'
-                                          ? 'bg-ca-danger'
-                                          : sub.riskLevel === 'Medium'
-                                            ? 'bg-ca-warn'
-                                            : 'bg-ca-ok'
-                                      }`}
-                                      style={{ width: `${Math.min(100, prob * 100)}%` }}
-                                    />
-                                  </div>
+                                  <span className="text-xs font-mono font-semibold text-ca-ink">
+                                    {probability !== null
+                                      ? `${(probability * 100).toFixed(1)}%`
+                                      : '--'}
+                                  </span>
+                                  {probability !== null && (
+                                    <div className="w-24 h-1.5 rounded-full bg-ca-bg-elevated overflow-hidden">
+                                      <div
+                                        className={`h-full rounded-full ${
+                                          sub.riskLevel === 'High'
+                                            ? 'bg-ca-danger'
+                                            : sub.riskLevel === 'Medium'
+                                              ? 'bg-ca-warn'
+                                              : 'bg-ca-ok'
+                                        }`}
+                                        style={{ width: `${Math.min(100, probability * 100)}%` }}
+                                      />
+                                    </div>
+                                  )}
                                 </div>
                               </td>
                               <td className="py-3 px-4">
                                 <span
-                                  className={`inline-block px-2 py-0.5 rounded-md font-semibold text-[10px] uppercase tracking-wide ${
-                                    sub.riskLevel === 'High'
-                                      ? 'bg-ca-danger-soft text-ca-danger'
-                                      : sub.riskLevel === 'Medium'
-                                        ? 'bg-ca-brand-soft text-ca-brand'
-                                        : 'bg-ca-ok-soft text-ca-ok'
-                                  }`}
+                                  title={sub.errorMessage || undefined}
+                                  className={`inline-block px-2 py-0.5 rounded-md font-semibold text-[10px] uppercase tracking-wide ${statusClass}`}
                                 >
-                                  {sub.riskLevel || 'Analyzing'}
+                                  {statusLabel}
                                 </span>
                               </td>
                               <td className="py-3 px-4 text-ca-muted font-mono text-xs">

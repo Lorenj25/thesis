@@ -16,6 +16,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPExcepti
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from backend.analysis import run_analysis
 from backend.database import get_db
 from backend.models import Lobby, Submission
 from backend.ws import manager
@@ -185,7 +186,7 @@ def submit_code(
             file_name=filename,
             language=language,
             source_code=source_code,
-            status="pending",
+            status="analyzing",
             created_at=now,
         )
         prepared_submissions.append(sub)
@@ -219,12 +220,7 @@ def submit_code(
             },
         )
 
-        # Queue background analysis if background analysis module is available
-        try:
-            from backend.analysis import run_analysis
-            background_tasks.add_task(run_analysis, sub.id)
-        except ImportError:
-            pass
+        background_tasks.add_task(run_analysis, sub.id)
 
     return {
         "status": "received",

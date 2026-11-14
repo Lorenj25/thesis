@@ -65,7 +65,7 @@ class SubmissionBase(BaseModel):
 class SubmissionResponse(SubmissionBase):
     id: int
     lobby_id: uuid.UUID
-    status: str  # pending | done | failed
+    status: str  # pending | analyzing | done | failed
     ai_probability: Optional[float] = None
     risk_level: Optional[str] = None  # Low | Medium | High
     error_message: Optional[str] = None

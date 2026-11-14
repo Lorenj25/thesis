@@ -31,6 +31,8 @@ def run_analysis(submission_id: int) -> None:
             return
 
         print(f"[ANALYSIS START] Starting analysis for submission {submission_id} ({submission.file_name}, {submission.language})...")
+        submission.status = "analyzing"
+        db.commit()
 
         # Acquire inference lock so only one model forward pass executes at a time
         with inference_lock:
