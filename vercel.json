@@ -1,0 +1,20 @@
+{
+  "rewrites": [
+    {
+      "source": "/auth/:path*",
+      "destination": "https://thesis-ifng.onrender.com/auth/:path*"
+    },
+    {
+      "source": "/lobbies/:path*",
+      "destination": "https://thesis-ifng.onrender.com/lobbies/:path*"
+    },
+    {
+      "source": "/lobby/:path*",
+      "destination": "https://thesis-ifng.onrender.com/lobby/:path*"
+    },
+    {
+      "source": "/public/:path*",
+      "destination": "https://thesis-ifng.onrender.com/public/:path*"
+    }
+  ]
+}
