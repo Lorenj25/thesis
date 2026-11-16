@@ -24,13 +24,14 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from pathlib import Path
 try:
     from dotenv import load_dotenv
     load_dotenv()
 except ImportError:
     pass
 
-DEFAULT_HF_TOKEN = os.getenv("HF_TOKEN", "HFAKJhuzmndZtZbynCG8mEJhGOP5VEP")
+DEFAULT_HF_TOKEN = os.getenv("HF_TOKEN", "")
 MIN_TOKENS_THRESHOLD = 30
 USER_AGENT = "CodeAuthentic/1.0"
 
