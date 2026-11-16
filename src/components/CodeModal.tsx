@@ -21,6 +21,7 @@ export const CodeModal: React.FC<CodeModalProps> = ({ submission, onClose }) => 
   };
 
   const getRiskClasses = (risk: string | null, status: Submission['status']) => {
+    if (status === 'unavailable') return 'text-ca-warn bg-ca-warn-soft border-ca-border';
     if (status === 'failed') return 'text-ca-danger bg-ca-danger-soft border-ca-border';
     if (risk === 'High') return 'text-ca-danger bg-ca-danger-soft border-ca-border';
     if (risk === 'Medium') return 'text-ca-warn bg-ca-warn-soft border-ca-border';
@@ -28,9 +29,12 @@ export const CodeModal: React.FC<CodeModalProps> = ({ submission, onClose }) => 
     return 'text-ca-muted bg-ca-bg-elevated border-ca-border';
   };
   const analysisLabel =
-    submission.status === 'failed'
-      ? 'FAILED'
-      : submission.riskLevel || (submission.status === 'done' ? 'NO SCORE' : 'ANALYZING');
+    submission.status === 'unavailable'
+      ? 'MODEL UNAVAILABLE'
+      : submission.status === 'failed'
+        ? 'FAILED'
+        : submission.riskLevel ||
+          (submission.status === 'done' ? 'NO SCORE' : 'ANALYZING');
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ca-overlay backdrop-blur-sm ca-fade-in">
@@ -93,12 +97,19 @@ export const CodeModal: React.FC<CodeModalProps> = ({ submission, onClose }) => 
             </div>
           </div>
 
-          {submission.status === 'failed' && submission.errorMessage && (
+          {(submission.status === 'failed' || submission.status === 'unavailable') &&
+            submission.errorMessage && (
             <div
               role="alert"
-              className="px-6 py-3 bg-ca-danger-soft border-b border-ca-border text-sm text-ca-danger"
+              className={`px-6 py-3 border-b border-ca-border text-sm ${
+                submission.status === 'unavailable'
+                  ? 'bg-ca-warn-soft text-ca-warn'
+                  : 'bg-ca-danger-soft text-ca-danger'
+              }`}
             >
-              <strong className="block mb-1">Analysis failed</strong>
+              <strong className="block mb-1">
+                {submission.status === 'unavailable' ? 'Model unavailable' : 'Analysis failed'}
+              </strong>
               <span>{submission.errorMessage}</span>
             </div>
           )}

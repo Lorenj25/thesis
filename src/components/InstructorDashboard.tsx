@@ -829,11 +829,16 @@ export const InstructorDashboard: React.FC<InstructorDashboardProps> = ({
                         displayedSubmissions.map((sub) => {
                           const probability = sub.aiProbability;
                           const statusLabel =
-                            sub.status === 'failed'
-                              ? 'Failed'
-                              : sub.riskLevel || (sub.status === 'done' ? 'No score' : 'Analyzing');
+                            sub.status === 'unavailable'
+                              ? 'Model unavailable'
+                              : sub.status === 'failed'
+                                ? 'Failed'
+                                : sub.riskLevel ||
+                                  (sub.status === 'done' ? 'No score' : 'Analyzing');
                           const statusClass =
-                            sub.status === 'failed'
+                            sub.status === 'unavailable'
+                              ? 'bg-ca-warn-soft text-ca-warn'
+                              : sub.status === 'failed'
                               ? 'bg-ca-danger-soft text-ca-danger'
                               : sub.riskLevel === 'High'
                                 ? 'bg-ca-danger-soft text-ca-danger'

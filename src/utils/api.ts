@@ -72,6 +72,10 @@ async function request<T>(
 }
 
 function mapSubmission(submission: ApiSubmission): Submission {
+  const missingClassifier =
+    submission.status === 'failed' &&
+    submission.error_message?.startsWith('Classifier head for language ');
+
   return {
     id: String(submission.id),
     lobbyId: submission.lobby_id,
@@ -79,7 +83,7 @@ function mapSubmission(submission: ApiSubmission): Submission {
     fileName: submission.file_name,
     language: submission.language,
     sourceCode: '',
-    status: submission.status,
+    status: missingClassifier ? 'unavailable' : submission.status,
     aiProbability: submission.ai_probability,
     riskLevel: submission.risk_level,
     errorMessage: submission.error_message || undefined,

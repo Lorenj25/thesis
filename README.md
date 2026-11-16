@@ -139,3 +139,6 @@ sign in with a registered account; generated lobby UUIDs and links resolve throu
 backend, so sharing works across browsers and devices connected to that deployment.
 For local network sharing, open the dashboard using the host machine's LAN address rather
 than `localhost`, or configure `PUBLIC_BASE_URL` to that address.
+If a trained classifier head is missing, submissions are still saved and shown as
+`Model unavailable` without a fabricated AI probability. Add the trained head under
+`ml/heads/` and redeploy to enable scoring.

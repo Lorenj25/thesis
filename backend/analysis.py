@@ -38,13 +38,18 @@ def run_analysis(submission_id: int) -> None:
         with inference_lock:
             try:
                 # Dynamic import of ml.predictor.analyze
-                from ml.predictor import analyze
+                from ml.predictor import HeadNotTrainedError, analyze
                 result = analyze(submission.source_code, submission.file_name)
 
                 submission.ai_probability = float(result["ai_probability"])
                 submission.risk_level = str(result["risk_level"])
                 submission.status = "done"
                 submission.error_message = None
+
+            except HeadNotTrainedError as ml_err:
+                print(f"[ANALYSIS UNAVAILABLE] Submission {submission_id}: {ml_err}")
+                submission.status = "unavailable"
+                submission.error_message = str(ml_err)
 
             except Exception as ml_err:
                 print(f"[ANALYSIS EXCEPTION] Error processing submission {submission_id}: {ml_err}")

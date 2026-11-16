@@ -34,7 +34,7 @@ export interface Submission {
   fileName: string;
   language: Language;
   sourceCode: string;
-  status: 'pending' | 'analyzing' | 'done' | 'failed';
+  status: 'pending' | 'analyzing' | 'done' | 'failed' | 'unavailable';
   aiProbability: number | null; // 0.0 to 1.0
   riskLevel: RiskLevel | null;
   errorMessage?: string;
