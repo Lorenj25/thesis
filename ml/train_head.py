@@ -179,9 +179,11 @@ def load_dataset_from_disk(data_dir: Path, language: str) -> Tuple[List[str], Li
                 content = f.read_text(encoding="utf-8", errors="ignore")
                 if len(content.strip()) > 0:
                     ai_like = _generate_ai_sample_from_model(content, language)
-                    if ai_like and len(ai_like.strip()) > 0:
+                    if ai_like and ai_like.strip() and ai_like.strip() != content.strip():
                         code_samples.append(ai_like)
                         labels.append(1)
+                    else:
+                        print(f"  [WARNING] No distinct AI-like sample generated from {f.name}; skipping it.")
             except Exception as exc:
                 print(f"  Warning: Failed to synthesize AI sample from {f.name}: {exc}")
 
