@@ -42,7 +42,7 @@ _AI_MASKED_LM_CACHE: Dict[str, tuple] = {}
 
 
 def _load_masked_lm(language: str):
-    """Load and cache a mask-filling model for synthetic AI sample generation."""
+    """Load and cache a local Transformers model for masked-token generation."""
     if language in _AI_MASKED_LM_CACHE:
         return _AI_MASKED_LM_CACHE[language]
 
@@ -71,7 +71,7 @@ def _mask_random_code_tokens(code: str) -> str:
 
     candidate_indices = list(range(len(tokens)))
     random.shuffle(candidate_indices)
-    mask_count = max(1, min(3, len(tokens) // 12))
+    mask_count = 1
     for idx in candidate_indices[:mask_count]:
         if tokens[idx].strip() and not tokens[idx].isspace():
             tokens[idx] = "<mask>"
@@ -84,9 +84,8 @@ def _mask_random_code_tokens(code: str) -> str:
 
 
 def _generate_ai_sample_from_model(code: str, language: str) -> str:
-    """Use the language model to create an AI-like version of a human snippet."""
-    model_id = {"python": "neulab/codebert-python", "java": "neulab/codebert-java", "c": "neulab/codebert-c"}.get(language)
-    if not model_id:
+    """Use local Transformers fill-mask inference to create a synthetic variant."""
+    if language not in {"python", "java", "c"}:
         raise ValueError(f"Unsupported language: {language}")
 
     masked_prompt = _mask_random_code_tokens(code)
@@ -94,40 +93,32 @@ def _generate_ai_sample_from_model(code: str, language: str) -> str:
         return code
 
     try:
-        if language in {"python", "java"}:
-            api_key = os.getenv("HF_TOKEN")
-            if not api_key:
-                raise RuntimeError("HF_TOKEN is required to synthesize AI samples with hosted inference.")
-            from huggingface_hub import InferenceClient
-            client = InferenceClient(provider="hf-inference", api_key=api_key)
-            prompt = masked_prompt[:5000]
-            result = client.fill_mask(prompt, model=model_id)
-            if not result:
-                return code
-            best = result[0]
-            if isinstance(best, dict):
-                filled = best.get("token_str", "")
-                return prompt.replace("<mask>", filled, 1)
-            if isinstance(best, list):
-                first = best[0]
-                if isinstance(first, dict):
-                    return prompt.replace("<mask>", first.get("token_str", ""), 1)
-            return code
-
         import torch
         tokenizer, model = _load_masked_lm(language)
-        inputs = tokenizer(masked_prompt[:5000], return_tensors="pt", truncation=True, max_length=512)
+        inputs = tokenizer(
+            masked_prompt[:5000],
+            return_tensors="pt",
+            truncation=True,
+            max_length=512,
+        )
+        device = next(model.parameters()).device
+        inputs = {name: tensor.to(device) for name, tensor in inputs.items()}
         with torch.no_grad():
             outputs = model(**inputs)
         logits = outputs.logits
         mask_positions = (inputs["input_ids"] == tokenizer.mask_token_id)[0].nonzero(as_tuple=False)
         if mask_positions.numel() == 0:
             return code
-        mask_index = mask_positions[0].item()
-        probs = logits[0, mask_index].softmax(dim=-1)
-        top_token_id = probs.argmax().item()
-        filled = tokenizer.decode([top_token_id]).strip()
-        return masked_prompt.replace("<mask>", filled, 1)
+
+        generated = masked_prompt
+        for position in mask_positions:
+            mask_index = position.item()
+            token_id = logits[0, mask_index].argmax().item()
+            replacement = tokenizer.decode([token_id]).strip()
+            if not replacement:
+                return code
+            generated = generated.replace("<mask>", replacement, 1)
+        return generated
     except Exception as exc:
         print(f"  [WARNING] AI sample synthesis failed for {language}: {exc}")
         return code
@@ -136,7 +127,7 @@ def _generate_ai_sample_from_model(code: str, language: str) -> str:
 def load_dataset_from_disk(data_dir: Path, language: str) -> Tuple[List[str], List[int]]:
     """
     Reads human-written code (label 0). If no AI dataset is available, synthesizes
-    AI-like samples directly from the human corpus using the model's fill-mask API.
+    AI-like variants locally from the human corpus using Transformers fill-mask inference.
     """
     human_dir = data_dir / "human"
     ai_dir = data_dir / "ai"

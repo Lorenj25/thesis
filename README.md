@@ -65,6 +65,12 @@ python -m ml.train_head --language java --data dataset/java
 # Train C head
 python -m ml.train_head --language c --data dataset/c
 ```
+If an `ai/` folder is absent, the trainer uses local Transformers fill-mask inference
+to create provisional variants from human samples; this does not require paid Hugging
+Face Inference credits. These synthetic variants are not a substitute for real
+AI-generated examples, so treat resulting scores as experimental until evaluated on
+held-out human and AI code.
+
 This prints Accuracy, Precision, Recall, and F1 score for validation and test splits, and serializes the heads to:
 - `ml/heads/python.joblib`
 - `ml/heads/java.joblib`
