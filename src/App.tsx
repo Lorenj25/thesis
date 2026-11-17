@@ -6,6 +6,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Instructor, Lobby, Submission, Theme } from './types';
 import {
+  ApiRequestError,
   clearAuthSession,
   createLobby as createRemoteLobby,
   deleteLobby as deleteRemoteLobby,
@@ -32,6 +33,7 @@ export default function App() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [initialStudentLobbyCode, setInitialStudentLobbyCode] = useState('');
   const [dashboardError, setDashboardError] = useState<string | null>(null);
+  const [sessionNotice, setSessionNotice] = useState<string | null>(null);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   const refreshDashboardData = useCallback(async () => {
@@ -42,6 +44,17 @@ export default function App() {
       setSubmissions(data.submissions);
       setDashboardError(null);
     } catch (error) {
+      if (error instanceof ApiRequestError && error.status === 401) {
+        clearAuthSession();
+        setInstructor(null);
+        setAuthToken(null);
+        setLobbies([]);
+        setSubmissions([]);
+        setDashboardError(null);
+        setSessionNotice('Your session has expired. Please sign in again.');
+        setCurrentView('instructor');
+        return;
+      }
       setDashboardError(
         error instanceof Error ? error.message : 'Unable to load instructor data.',
       );
@@ -87,6 +100,7 @@ export default function App() {
     saveAuthSession(newInstructor, token);
     setInstructor(newInstructor);
     setAuthToken(token);
+    setSessionNotice(null);
     setCurrentView('instructor');
   };
 
@@ -97,6 +111,7 @@ export default function App() {
     setLobbies([]);
     setSubmissions([]);
     setDashboardError(null);
+    setSessionNotice(null);
     setCurrentView('home');
   };
 
@@ -164,7 +179,7 @@ export default function App() {
             isInstructorLoggedIn={!!instructor}
           />
         ) : currentView === 'instructor' && !instructor ? (
-          <InstructorLogin onLogin={handleLogin} />
+          <InstructorLogin onLogin={handleLogin} notice={sessionNotice} />
         ) : currentView === 'instructor' && instructor ? (
           <section className="ca-hero ca-hero--app">
             <img src={instructorBg} alt="" className="ca-hero__media" aria-hidden="true" />

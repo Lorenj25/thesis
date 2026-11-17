@@ -6,9 +6,10 @@ import heroHall from '../assets/HB.png';
 
 interface InstructorLoginProps {
   onLogin: (instructor: Instructor, token: string) => void;
+  notice?: string | null;
 }
 
-export const InstructorLogin: React.FC<InstructorLoginProps> = ({ onLogin }) => {
+export const InstructorLogin: React.FC<InstructorLoginProps> = ({ onLogin, notice }) => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
@@ -70,6 +71,15 @@ export const InstructorLogin: React.FC<InstructorLoginProps> = ({ onLogin }) => 
                 Sign in to manage exam lobbies stored on the shared server.
               </p>
             </div>
+
+            {notice && (
+              <div
+                className="p-3 rounded-xl bg-ca-brand/10 border border-ca-border text-ca-ink text-sm"
+                role="status"
+              >
+                {notice}
+              </div>
+            )}
 
             {error && (
               <div className="p-3 rounded-xl bg-ca-danger-soft border border-ca-border text-ca-danger text-xs flex items-start gap-2">
